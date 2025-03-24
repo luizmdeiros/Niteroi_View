@@ -53,8 +53,6 @@
         <script src="js/rbush.min.js"></script>
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
-        <script src="https://unpkg.com/supercluster@7.1.5/dist/supercluster.min.js"></script>
-        <script src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js"></script>
         <script src="data/Agua_Niteroi_0.js"></script>
         <script src="data/Terreno_Niteroi_1.js"></script>
         <script src="data/Lagunas_2.js"></script>
@@ -66,24 +64,6 @@
         const CACHE_VERSION = 'v1';
         const CACHE_NAME = `webmap-data-${CACHE_VERSION}`;
         
-        // Configuration for performance optimization
-        const CONFIG = {
-            // Year threshold for using advanced rendering techniques
-            HEAVY_YEAR_THRESHOLD: 1950,
-            // Use WebGL rendering for years after the threshold
-            USE_WEBGL_FOR_HEAVY_YEARS: true,
-            // Use vector tiles approach for complex geometries
-            USE_VECTOR_TILES: true,
-            // Number of years to preload on each side of the current year
-            PRELOAD_ADJACENT_YEARS: 2,
-            // Maximum number of features to process at once for progressive loading
-            PROGRESSIVE_LOAD_CHUNK_SIZE: 500,
-            // Clustering distance in pixels
-            CLUSTER_RADIUS: 80,
-            // Maximum zoom level for clustering
-            CLUSTER_MAX_ZOOM: 16
-        };
-        
         var map = L.map('map', {
             zoomControl: false,
             maxZoom: 16,
@@ -94,15 +74,6 @@
         
         // Create a cache for filtered layers
         var layerCache = {};
-        
-        // Create a cache for preloaded adjacent years
-        var preloadCache = {};
-        
-        // Track the current year being displayed
-        var currentYear = 1820;
-        
-        // Flag to track if we're using WebGL rendering
-        var usingWebGL = false;
         
         if ('caches' in window) {
             caches.open(CACHE_NAME).then(cache => {
@@ -632,117 +603,49 @@
             return index;
         }
         
-        // Create clusters for point features
-        function createClusters(features) {
-            // Convert GeoJSON features to points for SuperCluster
-            var points = features
-                .filter(f => f.geometry && (f.geometry.type === 'Point' || f.geometry.type === 'MultiPoint'))
-                .map((feature, id) => {
-                    var coords;
-                    if (feature.geometry.type === 'Point') {
-                        coords = feature.geometry.coordinates;
-                    } else if (feature.geometry.type === 'MultiPoint' && feature.geometry.coordinates.length > 0) {
-                        coords = feature.geometry.coordinates[0];
-                    } else {
-                        return null;
-                    }
-                    
-                    return {
-                        type: 'Feature',
-                        properties: { 
-                            ...feature.properties,
-                            id: id
-                        },
-                        geometry: {
-                            type: 'Point',
-                            coordinates: coords
-                        }
-                    };
-                })
-                .filter(p => p !== null);
+        function getBoundsFromFeature(feature) {
+            if (!feature || !feature.geometry || !feature.geometry.coordinates) return null;
             
-            // Create SuperCluster instance
-            var cluster = new Supercluster({
-                radius: CONFIG.CLUSTER_RADIUS,
-                maxZoom: CONFIG.CLUSTER_MAX_ZOOM
-            });
+            var coords = feature.geometry.coordinates;
+            var bounds;
             
-            // Load points into the cluster
-            cluster.load(points);
-            
-            return {
-                cluster: cluster,
-                points: points
-            };
-        }
-        
-        // Function to create vector tiles from GeoJSON
-        function createVectorTiles(features, layerName, styleFunction) {
-            // Create a GeoJSON with the features
-            var geojson = {
-                type: 'FeatureCollection',
-                features: features
-            };
-            
-            // Create vector grid from GeoJSON
-            var vectorGrid = L.vectorGrid.slicer(geojson, {
-                rendererFactory: L.svg.tile,
-                vectorTileLayerStyles: {
-                    sliced: styleFunction
-                },
-                maxZoom: 16,
-                minZoom: 13,
-                interactive: true,
-                getFeatureId: function(f) {
-                    return f.properties.id || Math.random().toString(36).substring(2, 15);
-                }
-            });
-            
-            return vectorGrid;
-        }
-        
-        // Function to render features using WebGL
-        function renderWithWebGL(features, layerName) {
-            // Convert features to format expected by leaflet.glify
-            var points = [];
-            var colors = [];
-            var data = [];
-            
-            features.forEach(function(feature) {
+            try {
                 if (feature.geometry.type === 'Point') {
-                    points.push([
-                        feature.geometry.coordinates[1], 
-                        feature.geometry.coordinates[0]
-                    ]);
-                    colors.push([255, 0, 0, 255]); // Red color with full opacity
-                    data.push(feature.properties);
-                } else if (feature.geometry.type === 'MultiPoint') {
-                    feature.geometry.coordinates.forEach(function(coord) {
-                        points.push([coord[1], coord[0]]);
-                        colors.push([255, 0, 0, 255]);
-                        data.push(feature.properties);
+                    bounds = L.latLngBounds([coords[1], coords[0]], [coords[1], coords[0]]);
+                } else if (feature.geometry.type === 'LineString') {
+                    bounds = L.latLngBounds();
+                    coords.forEach(function(coord) {
+                        bounds.extend([coord[1], coord[0]]);
+                    });
+                } else if (feature.geometry.type === 'Polygon') {
+                    bounds = L.latLngBounds();
+                    coords[0].forEach(function(coord) {
+                        bounds.extend([coord[1], coord[0]]);
+                    });
+                } else if (feature.geometry.type === 'MultiPolygon') {
+                    bounds = L.latLngBounds();
+                    coords.forEach(function(polygon) {
+                        polygon[0].forEach(function(coord) {
+                            bounds.extend([coord[1], coord[0]]);
+                        });
                     });
                 }
-            });
-            
-            // Only create WebGL layer if we have points
-            if (points.length > 0) {
-                return L.glify.points({
-                    map: map,
-                    data: points,
-                    colors: colors,
-                    className: layerName,
-                    opacity: 0.8,
-                    size: 5,
-                    click: function(e, feature, xy) {
-                        console.log('Clicked point:', feature, 'at', xy);
-                    }
-                });
+                return bounds;
+            } catch (e) {
+                console.error("Error creating bounds for feature:", e);
+                return null;
             }
-            
-            return null;
         }
         
+        // Create spatial indices for all feature collections
+        var spatialIndex_Logradouros;
+        var spatialIndex_Terreno;
+        var spatialIndex_Area;
+        var spatialIndex_Edificios;
+        spatialIndex_Logradouros = createSpatialIndex(originalFeatures);
+        spatialIndex_Terreno = createSpatialIndex(originalFeatures_Terreno);
+        spatialIndex_Area = createSpatialIndex(originalFeatures_Area);
+        spatialIndex_Edificios = createSpatialIndex(originalFeatures_Edificios);
         // Add debouncing to prevent excessive rendering during slider movement
         var debounceTimer;
         function debouncedUpdateYear(value) {
@@ -753,235 +656,6 @@
             }, 100); // 100ms debounce time
         }
 
-        // Preload data for adjacent years
-        function preloadAdjacentYears(year) {
-            var yearsToPreload = [];
-            for (var i = 1; i <= CONFIG.PRELOAD_ADJACENT_YEARS; i++) {
-                yearsToPreload.push(parseInt(year) + i);
-                yearsToPreload.push(parseInt(year) - i);
-            }
-            
-            yearsToPreload.forEach(function(yearToPreload) {
-                if (yearToPreload >= 1820 && yearToPreload <= 2020 && !layerCache['year_' + yearToPreload]) {
-                    setTimeout(function() {
-                        processYearData(yearToPreload, true);
-                    }, 100 * (Math.abs(yearToPreload - year))); // Stagger the preloading
-                }
-            });
-        }
-        
-        // Process data for a specific year (either for display or preloading)
-        function processYearData(year, isPreloading) {
-            // Skip if already in cache
-            if (layerCache['year_' + year]) {
-                return;
-            }
-            
-            // Determine if this is a "heavy" year that needs special handling
-            var isHeavyYear = year >= CONFIG.HEAVY_YEAR_THRESHOLD;
-            
-            // Filter features for this year
-            var filteredFeatures = filterFeaturesByDate(originalFeatures, year);
-            var filteredTerreno = filterFeaturesByDate(originalFeatures_Terreno, year);
-            var filteredArea = filterFeaturesByDate(originalFeatures_Area, year);
-            var filteredEdificios = filterFeaturesByDate(originalFeatures_Edificios, year);
-            
-            // Apply geometry simplification based on zoom level
-            var zoomLevel = map.getZoom();
-            var simplifyTolerance = zoomLevel < 14 ? 0.0001 : 0;
-            
-            if (simplifyTolerance > 0) {
-                filteredFeatures = simplifyFeatures(filteredFeatures, simplifyTolerance);
-                filteredTerreno = simplifyFeatures(filteredTerreno, simplifyTolerance);
-                filteredArea = simplifyFeatures(filteredArea, simplifyTolerance);
-            }
-            
-            // Create layers based on the year's complexity
-            var layers = {};
-            
-            if (isHeavyYear && CONFIG.USE_WEBGL_FOR_HEAVY_YEARS) {
-                // Use WebGL rendering for heavy years
-                var webglLayer = renderWithWebGL(filteredFeatures, 'layer_Logradouros_6');
-                if (webglLayer) {
-                    layers.logradouros = webglLayer;
-                } else {
-                    // Fallback to regular rendering if WebGL fails
-                    layers.logradouros = createRegularLayer(filteredFeatures, 'layer_Logradouros_6', true);
-                }
-            } else if (isHeavyYear && CONFIG.USE_VECTOR_TILES) {
-                // Use vector tiles for heavy years
-                layers.logradouros = createVectorTiles(filteredFeatures, 'layer_Logradouros_6', function(properties, zoom) {
-                    return {
-                        weight: 1,
-                        color: '#ff7800',
-                        opacity: 0.8,
-                        fill: true,
-                        radius: 6,
-                        fillOpacity: 0.5
-                    };
-                });
-            } else {
-                // Use regular Leaflet layers for lighter years
-                layers.logradouros = createRegularLayer(filteredFeatures, 'layer_Logradouros_6', false);
-            }
-            
-            // Always use regular layers for these since they're usually not as heavy
-            layers.terreno = createRegularLayer(filteredTerreno, 'layer_Terreno_Niteroi_1', false);
-            layers.area = createRegularLayer(filteredArea, 'layer_Area_Urbana_4', false);
-            layers.edificios = createRegularLayer(filteredEdificios, 'layer_EdifciosHistricos_7', false);
-            
-            // Store in cache
-            layerCache['year_' + year] = layers;
-            
-            // If not preloading, update the display
-            if (!isPreloading && year == currentYear) {
-                displayYear(year);
-            }
-        }
-        
-        // Create a regular Leaflet layer
-        function createRegularLayer(features, layerName, useCluster) {
-            if (layerName === 'layer_Logradouros_6') {
-                if (useCluster) {
-                    // Create clusters for point features
-                    var clusterInfo = createClusters(features);
-                    
-                    // Create a layer with the clustered data
-                    var clusterLayer = L.layerGroup();
-                    
-                    // Get clusters for current zoom level
-                    var zoom = map.getZoom();
-                    var clusters = clusterInfo.cluster.getClusters(
-                        [-180, -90, 180, 90], 
-                        Math.min(zoom, CONFIG.CLUSTER_MAX_ZOOM)
-                    );
-                    
-                    clusters.forEach(function(cluster) {
-                        if (cluster.properties.cluster) {
-                            // It's a cluster
-                            var marker = L.circleMarker(
-                                [cluster.geometry.coordinates[1], cluster.geometry.coordinates[0]], 
-                                {
-                                    radius: 10 + Math.min(cluster.properties.point_count / 100, 20),
-                                    fillColor: '#ff7800',
-                                    color: '#fff',
-                                    weight: 1,
-                                    opacity: 1,
-                                    fillOpacity: 0.8
-                                }
-                            );
-                            marker.bindTooltip(cluster.properties.point_count.toString());
-                            clusterLayer.addLayer(marker);
-                        } else {
-                            // It's a single point
-                            var originalFeature = clusterInfo.points[cluster.properties.id];
-                            var marker = L.circleMarker(
-                                [cluster.geometry.coordinates[1], cluster.geometry.coordinates[0]], 
-                                {
-                                    radius: 5,
-                                    fillColor: '#ff7800',
-                                    color: '#fff',
-                                    weight: 1,
-                                    opacity: 1,
-                                    fillOpacity: 0.8
-                                }
-                            );
-                            clusterLayer.addLayer(marker);
-                        }
-                    });
-                    
-                    return clusterLayer;
-                } else {
-                    return new L.geoJson.multiStyle({
-                        type: "FeatureCollection",
-                        features: features
-                    }, {
-                        attribution: '',
-                        interactive: true,
-                        dataVar: 'json_Logradouros_6',
-                        layerName: 'layer_Logradouros_6',
-                        pane: 'pane_Logradouros_6',
-                        onEachFeature: pop_Logradouros_6,
-                        styles: [style_Logradouros_6_0, style_Logradouros_6_1]
-                    });
-                }
-            } else if (layerName === 'layer_Terreno_Niteroi_1') {
-                return new L.geoJson({
-                    type: "FeatureCollection",
-                    features: features
-                }, {
-                    attribution: '',
-                    interactive: true,
-                    dataVar: 'json_Terreno_Niteroi_1',
-                    layerName: 'layer_Terreno_Niteroi_1',
-                    pane: 'pane_Terreno_Niteroi_1',
-                    onEachFeature: pop_Terreno_Niteroi_1,
-                    style: style_Terreno_Niteroi_1_0
-                });
-            } else if (layerName === 'layer_Area_Urbana_4') {
-                return new L.geoJson({
-                    type: "FeatureCollection",
-                    features: features
-                }, {
-                    attribution: '',
-                    interactive: true,
-                    dataVar: 'json_Area_Urbana_4',
-                    layerName: 'layer_Area_Urbana_4',
-                    pane: 'pane_Area_Urbana_4',
-                    onEachFeature: pop_Area_Urbana_4,
-                    style: style_Area_Urbana_4_0
-                });
-            } else if (layerName === 'layer_EdifciosHistricos_7') {
-                return new L.geoJson({
-                    type: "FeatureCollection",
-                    features: features
-                }, {
-                    attribution: '',
-                    interactive: true,
-                    dataVar: 'json_EdifciosHistricos_7',
-                    layerName: 'layer_EdifciosHistricos_7',
-                    pane: 'pane_EdifciosHistricos_7',
-                    onEachFeature: pop_EdifciosHistricos_7,
-                    style: style_EdifciosHistricos_7_0
-                });
-            }
-            
-            return null;
-        }
-        
-        // Display a specific year
-        function displayYear(year) {
-            // Remove current layers
-            if (map.hasLayer(layer_Logradouros_6)) map.removeLayer(layer_Logradouros_6);
-            if (map.hasLayer(layer_Terreno_Niteroi_1)) map.removeLayer(layer_Terreno_Niteroi_1);
-            if (map.hasLayer(layer_Area_Urbana_4)) map.removeLayer(layer_Area_Urbana_4);
-            if (map.hasLayer(layer_EdifciosHistricos_7)) map.removeLayer(layer_EdifciosHistricos_7);
-            
-            // Get layers from cache
-            var layers = layerCache['year_' + year];
-            
-            // Update global layer variables
-            layer_Logradouros_6 = layers.logradouros;
-            layer_Terreno_Niteroi_1 = layers.terreno;
-            layer_Area_Urbana_4 = layers.area;
-            layer_EdifciosHistricos_7 = layers.edificios;
-            
-            // Add layers to map
-            map.addLayer(layer_Logradouros_6);
-            map.addLayer(layer_Terreno_Niteroi_1);
-            map.addLayer(layer_Area_Urbana_4);
-            map.addLayer(layer_EdifciosHistricos_7);
-            
-            // Reset labels
-            resetLabels([layer_Logradouros_6, layer_Terreno_Niteroi_1, layer_Area_Urbana_4, layer_EdifciosHistricos_7]);
-            
-            // Update current year
-            currentYear = year;
-            
-            // Preload adjacent years
-            preloadAdjacentYears(year);
-        }
-
         function updateYear(value) {
             var selectedYear = parseInt(value);
             
@@ -989,78 +663,315 @@
             var cacheKey = 'year_' + selectedYear;
             if (layerCache[cacheKey]) {
                 // Use cached layers
-                displayYear(selectedYear);
+                if (map.hasLayer(layer_Logradouros_6)) map.removeLayer(layer_Logradouros_6);
+                if (map.hasLayer(layer_Terreno_Niteroi_1)) map.removeLayer(layer_Terreno_Niteroi_1);
+                if (map.hasLayer(layer_Area_Urbana_4)) map.removeLayer(layer_Area_Urbana_4);
+                if (map.hasLayer(layer_EdifciosHistricos_7)) map.removeLayer(layer_EdifciosHistricos_7);
+                
+                layer_Logradouros_6 = layerCache[cacheKey].logradouros;
+                layer_Terreno_Niteroi_1 = layerCache[cacheKey].terreno;
+                layer_Area_Urbana_4 = layerCache[cacheKey].area;
+                layer_EdifciosHistricos_7 = layerCache[cacheKey].edificios;
+                
+                map.addLayer(layer_Logradouros_6);
+                map.addLayer(layer_Terreno_Niteroi_1);
+                map.addLayer(layer_Area_Urbana_4);
+                map.addLayer(layer_EdifciosHistricos_7);
+                
+                // Reset labels for all filtered layers
+                resetLabels([layer_Logradouros_6, layer_Terreno_Niteroi_1, layer_Area_Urbana_4, layer_EdifciosHistricos_7]);
                 return;
             }
             
-            // Process data for this year
-            processYearData(selectedYear, false);
+            // Helper function to filter features by date - optimized version
+            function filterFeaturesByDate(features) {
+                return features.filter(function(feature) {
+                    try {
+                        var dataAbertStr = feature.properties.Data_abert || feature.properties.data_abert || feature.properties.Data_Abert;
+                        var dataFechaStr = feature.properties.Data_fecha || feature.properties.data_fecha || feature.properties.Data_Fecha;
+                        
+                        // Quick early returns for common cases
+                        if (!dataAbertStr) return true;
+                        
+                        // Cache for parsed dates
+                        if (!feature._parsedDates) {
+                            feature._parsedDates = {};
+                        }
+                        
+                        var dataAbertura, dataFechamento;
+                        
+                        // Use cached parsed dates if available
+                        if (feature._parsedDates.abertura !== undefined) {
+                            dataAbertura = feature._parsedDates.abertura;
+                        } else {
+                            dataAbertura = parseYearFromDate(dataAbertStr);
+                            feature._parsedDates.abertura = dataAbertura;
+                        }
+                        
+                        if (feature._parsedDates.fechamento !== undefined) {
+                            dataFechamento = feature._parsedDates.fechamento;
+                        } else if (dataFechaStr) {
+                            dataFechamento = parseYearFromDate(dataFechaStr);
+                            feature._parsedDates.fechamento = dataFechamento;
+                        } else {
+                            dataFechamento = null;
+                            feature._parsedDates.fechamento = null;
+                        }
+                        
+                        // If we couldn't parse the opening date, always show the feature
+                        if (!dataAbertura) return true;
+                         
+                        return (dataAbertura <= selectedYear) && 
+                               (!dataFechamento || selectedYear <= dataFechamento);
+                    } catch (e) {
+                        // If there's any error in parsing, show the feature
+                        return true;
+                    }
+                });
+            }
+            
+            // Helper function to parse year from various date formats - extracted for better performance
+            function parseYearFromDate(dateStr) {
+                if (!dateStr) return null;
+                
+                if (typeof dateStr === 'number') {
+                    return dateStr;
+                } else if (dateStr.match(/^\d{4}$/)) {
+                    return parseInt(dateStr);
+                } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    return parseInt(dateStr.substring(0, 4));
+                } else {
+                    var date = new Date(dateStr);
+                    if (!isNaN(date.getTime())) {
+                        return date.getFullYear();
+                    }
+                }
+                return null;
+            }
+            
+            // Filter and update Logradouros layer
+            if (map.hasLayer(layer_Logradouros_6)) {
+                map.removeLayer(layer_Logradouros_6);
+            }
+            
+            var filteredFeatures = filterFeaturesByDate(originalFeatures);
+            
+            // Simplify geometries based on zoom level for better performance
+            var zoomLevel = map.getZoom();
+            var simplifyTolerance = zoomLevel < 14 ? 0.0001 : 0;
+            
+            if (simplifyTolerance > 0) {
+                filteredFeatures = simplifyFeatures(filteredFeatures, simplifyTolerance);
+            }
+            
+            var newLayer = new L.geoJson.multiStyle({
+                type: "FeatureCollection",
+                features: filteredFeatures
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Logradouros_6',
+                layerName: 'layer_Logradouros_6',
+                pane: 'pane_Logradouros_6',
+                onEachFeature: pop_Logradouros_6,
+                styles: [style_Logradouros_6_0, style_Logradouros_6_1]
+            });
+            
+            layer_Logradouros_6 = newLayer;
+            
+            map.addLayer(layer_Logradouros_6);
+            
+            // Filter and update Terreno layer
+            if (map.hasLayer(layer_Terreno_Niteroi_1)) {
+                map.removeLayer(layer_Terreno_Niteroi_1);
+            }
+            
+            var filteredTerreno = filterFeaturesByDate(originalFeatures_Terreno);
+            
+            if (simplifyTolerance > 0) {
+                filteredTerreno = simplifyFeatures(filteredTerreno, simplifyTolerance);
+            }
+            
+            var newTerrenoLayer = new L.geoJson({
+                type: "FeatureCollection",
+                features: filteredTerreno
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Terreno_Niteroi_1',
+                layerName: 'layer_Terreno_Niteroi_1',
+                pane: 'pane_Terreno_Niteroi_1',
+                onEachFeature: pop_Terreno_Niteroi_1,
+                style: style_Terreno_Niteroi_1_0
+            });
+            
+            layer_Terreno_Niteroi_1 = newTerrenoLayer;
+            map.addLayer(layer_Terreno_Niteroi_1);
+            
+            // Filter and update Area Urbana layer
+            if (map.hasLayer(layer_Area_Urbana_4)) {
+                map.removeLayer(layer_Area_Urbana_4);
+            }
+            
+            var filteredArea = filterFeaturesByDate(originalFeatures_Area);
+            
+            if (simplifyTolerance > 0) {
+                filteredArea = simplifyFeatures(filteredArea, simplifyTolerance);
+            }
+            
+            var newAreaLayer = new L.geoJson({
+                type: "FeatureCollection",
+                features: filteredArea
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Area_Urbana_4',
+                layerName: 'layer_Area_Urbana_4',
+                pane: 'pane_Area_Urbana_4',
+                onEachFeature: pop_Area_Urbana_4,
+                style: style_Area_Urbana_4_0
+            });
+            
+            layer_Area_Urbana_4 = newAreaLayer;
+            map.addLayer(layer_Area_Urbana_4);
+            
+            // Filter and update Edificios Historicos layer
+            if (map.hasLayer(layer_EdifciosHistricos_7)) {
+                map.removeLayer(layer_EdifciosHistricos_7);
+            }
+            
+            var filteredEdificios = filterFeaturesByDate(originalFeatures_Edificios);
+            
+            var newEdificiosLayer = new L.geoJson({
+                type: "FeatureCollection",
+                features: filteredEdificios
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_EdifciosHistricos_7',
+                layerName: 'layer_EdifciosHistricos_7',
+                pane: 'pane_EdifciosHistricos_7',
+                onEachFeature: pop_EdifciosHistricos_7,
+                style: style_EdifciosHistricos_7_0
+            });
+            
+            layer_EdifciosHistricos_7 = newEdificiosLayer;
+            map.addLayer(layer_EdifciosHistricos_7);
+            
+            // Cache the layers for this year
+            layerCache[cacheKey] = {
+                logradouros: layer_Logradouros_6,
+                terreno: layer_Terreno_Niteroi_1,
+                area: layer_Area_Urbana_4,
+                edificios: layer_EdifciosHistricos_7
+            };
+            
+            // Limit cache size to prevent memory issues
+            var cacheKeys = Object.keys(layerCache);
+            if (cacheKeys.length > 10) { // Keep only 10 years in cache
+                delete layerCache[cacheKeys[0]];
+            }
+            
+            // Reset labels for all filtered layers
+            resetLabels([layer_Logradouros_6, layer_Terreno_Niteroi_1, layer_Area_Urbana_4, layer_EdifciosHistricos_7]);
         }
         
-        // Helper function to filter features by date - optimized version
-        function filterFeaturesByDate(features, selectedYear) {
-            return features.filter(function(feature) {
+        // Function to simplify geometries for better performance
+        function simplifyFeatures(features, tolerance) {
+            return features.map(function(feature) {
+                // Create a deep copy to avoid modifying original
+                var simplifiedFeature = JSON.parse(JSON.stringify(feature));
+                
                 try {
-                    var dataAbertStr = feature.properties.Data_abert || feature.properties.data_abert || feature.properties.Data_Abert;
-                    var dataFechaStr = feature.properties.Data_fecha || feature.properties.data_fecha || feature.properties.Data_Fecha;
-                    
-                    // Quick early returns for common cases
-                    if (!dataAbertStr) return true;
-                    
-                    // Cache for parsed dates
-                    if (!feature._parsedDates) {
-                        feature._parsedDates = {};
+                    if (feature.geometry.type === 'LineString') {
+                        simplifiedFeature.geometry.coordinates = simplifyLineString(feature.geometry.coordinates, tolerance);
+                    } else if (feature.geometry.type === 'Polygon') {
+                        simplifiedFeature.geometry.coordinates = feature.geometry.coordinates.map(function(ring) {
+                            return simplifyLineString(ring, tolerance);
+                        });
+                    } else if (feature.geometry.type === 'MultiPolygon') {
+                        simplifiedFeature.geometry.coordinates = feature.geometry.coordinates.map(function(polygon) {
+                            return polygon.map(function(ring) {
+                                return simplifyLineString(ring, tolerance);
+                            });
+                        });
                     }
-                    
-                    var dataAbertura, dataFechamento;
-                    
-                    // Use cached parsed dates if available
-                    if (feature._parsedDates.abertura !== undefined) {
-                        dataAbertura = feature._parsedDates.abertura;
-                    } else {
-                        dataAbertura = parseYearFromDate(dataAbertStr);
-                        feature._parsedDates.abertura = dataAbertura;
-                    }
-                    
-                    if (feature._parsedDates.fechamento !== undefined) {
-                        dataFechamento = feature._parsedDates.fechamento;
-                    } else if (dataFechaStr) {
-                        dataFechamento = parseYearFromDate(dataFechaStr);
-                        feature._parsedDates.fechamento = dataFechamento;
-                    } else {
-                        dataFechamento = null;
-                        feature._parsedDates.fechamento = null;
-                    }
-                    
-                    // If we couldn't parse the opening date, always show the feature
-                    if (!dataAbertura) return true;
-                     
-                    return (dataAbertura <= selectedYear) && 
-                           (!dataFechamento || selectedYear <= dataFechamento);
                 } catch (e) {
-                    // If there's any error in parsing, show the feature
-                    return true;
+                    console.error("Error simplifying feature:", e);
                 }
+                
+                return simplifiedFeature;
             });
         }
         
-        // Helper function to parse year from various date formats - extracted for better performance
-        function parseYearFromDate(dateStr) {
-            if (!dateStr) return null;
+        // Douglas-Peucker line simplification
+        function simplifyLineString(points, tolerance) {
+            if (points.length <= 2) return points;
             
-            if (typeof dateStr === 'number') {
-                return dateStr;
-            } else if (dateStr.match(/^\d{4}$/)) {
-                return parseInt(dateStr);
-            } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                return parseInt(dateStr.substring(0, 4));
-            } else {
-                var date = new Date(dateStr);
-                if (!isNaN(date.getTime())) {
-                    return date.getFullYear();
+            var sqTolerance = tolerance * tolerance;
+            
+            // Find the point with the maximum distance
+            var maxDist = 0;
+            var index = 0;
+            var end = points.length - 1;
+            
+            for (var i = 1; i < end; i++) {
+                var dist = pointToLineDistance(points[i], points[0], points[end]);
+                if (dist > maxDist) {
+                    index = i;
+                    maxDist = dist;
                 }
             }
-            return null;
+            
+            // If max distance is greater than tolerance, recursively simplify
+            var result = [];
+            if (maxDist > sqTolerance) {
+                var firstHalf = simplifyLineString(points.slice(0, index + 1), tolerance);
+                var secondHalf = simplifyLineString(points.slice(index), tolerance);
+                
+                // Concatenate the two simplified parts
+                result = firstHalf.slice(0, firstHalf.length - 1).concat(secondHalf);
+            } else {
+                result = [points[0], points[end]];
+            }
+            
+            return result;
+        }
+        
+        // Calculate squared distance from a point to a line segment
+        function pointToLineDistance(p, a, b) {
+            var x = p[0], y = p[1];
+            var x1 = a[0], y1 = a[1];
+            var x2 = b[0], y2 = b[1];
+            
+            var A = x - x1;
+            var B = y - y1;
+            var C = x2 - x1;
+            var D = y2 - y1;
+            
+            var dot = A * C + B * D;
+            var len_sq = C * C + D * D;
+            var param = -1;
+            
+            if (len_sq !== 0) param = dot / len_sq;
+            
+            var xx, yy;
+            
+            if (param < 0) {
+                xx = x1;
+                yy = y1;
+            } else if (param > 1) {
+                xx = x2;
+                yy = y2;
+            } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+            }
+            
+            var dx = x - xx;
+            var dy = y - yy;
+            
+            return dx * dx + dy * dy;
         }
         
         createLabels();
@@ -1070,34 +981,6 @@
         document.getElementById('timeline').oninput = function() {
             debouncedUpdateYear(this.value);
         };
-        
-        // Add event listener for zoom changes to update clustering
-        map.on('zoomend', function() {
-            if (currentYear >= CONFIG.HEAVY_YEAR_THRESHOLD) {
-                // Re-process the current year data with the new zoom level
-                delete layerCache['year_' + currentYear];
-                processYearData(currentYear, false);
-            }
-        });
-        
-        // Add loading indicator
-        var loadingIndicator = L.control({position: 'bottomleft'});
-        loadingIndicator.onAdd = function(map) {
-            this._div = L.DomUtil.create('div', 'loading-indicator');
-            this._div.innerHTML = '<div class="spinner"></div> Loading...';
-            this._div.style.display = 'none';
-            return this._div;
-        };
-        loadingIndicator.addTo(map);
-        
-        // Show/hide loading indicator
-        function showLoading() {
-            document.querySelector('.loading-indicator').style.display = 'block';
-        }
-        
-        function hideLoading() {
-            document.querySelector('.loading-indicator').style.display = 'none';
-        }
         </script>
 			 <div id="timeline_div">
 			    <div class="year-label">Year: <span id="year">1820</span></div>
@@ -1179,6 +1062,7 @@
 				font-size: 12px;
 				color: #777;
 				position: relative;
+				text-align: center;
 			}
 			
 			.labels span::before {
@@ -1209,38 +1093,174 @@
                 labelsDiv.appendChild(label);
             });
         }
+
+        function updateYear(value) {
+            document.getElementById('year').textContent = value;
+            var selectedYear = parseInt(value);
+            
+            // Helper function to filter features by date
+            function filterFeaturesByDate(features) {
+                return features.filter(function(feature) {
+                    try {
+                        var dataAbertStr = feature.properties.Data_abert || feature.properties.data_abert || feature.properties.Data_Abert;
+                        var dataFechaStr = feature.properties.Data_fecha || feature.properties.data_fecha || feature.properties.Data_Fecha;
+                        
+                        // If opening date is null/empty, always show the feature
+                        if (!dataAbertStr) {
+                            return true;
+                        }
+                        
+                        var dataAbertura = null;
+                        var dataFechamento = null;
+                        
+                        if (dataAbertStr) {
+                            if (typeof dataAbertStr === 'number') {
+                                dataAbertura = dataAbertStr;
+                            } else if (dataAbertStr.match(/^\d{4}$/)) {
+                                dataAbertura = parseInt(dataAbertStr);
+                            } else if (dataAbertStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                dataAbertura = parseInt(dataAbertStr.substring(0, 4));
+                            } else {
+                                var date = new Date(dataAbertStr);
+                                if (!isNaN(date.getTime())) {
+                                    dataAbertura = date.getFullYear();
+                                }
+                            }
+                        }
+                        
+                        if (dataFechaStr) {
+                            if (typeof dataFechaStr === 'number') {
+                                dataFechamento = dataFechaStr;
+                            } else if (dataFechaStr.match(/^\d{4}$/)) {
+                                dataFechamento = parseInt(dataFechaStr);
+                            } else if (dataFechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                dataFechamento = parseInt(dataFechaStr.substring(0, 4));
+                            } else {
+                                var date = new Date(dataFechaStr);
+                                if (!isNaN(date.getTime())) {
+                                    dataFechamento = date.getFullYear();
+                                }
+                            }
+                        }
+                        
+                        // If we couldn't parse the opening date, always show the feature
+                        if (!dataAbertura) return true;
+                         
+                        var isVisible = (dataAbertura <= selectedYear) && 
+                               (!dataFechamento || selectedYear <= dataFechamento);
+                        
+                        return isVisible;
+                    } catch (e) {
+                        // If there's any error in parsing, show the feature
+                        return true;
+                    }
+                });
+            }
+            
+            // Filter and update Logradouros layer
+            if (map.hasLayer(layer_Logradouros_6)) {
+                map.removeLayer(layer_Logradouros_6);
+            }
+            
+            var filteredFeatures = filterFeaturesByDate(originalFeatures);
+            
+            var newLayer = new L.geoJson.multiStyle({
+                type: "FeatureCollection",
+                features: filteredFeatures
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Logradouros_6',
+                layerName: 'layer_Logradouros_6',
+                pane: 'pane_Logradouros_6',
+                onEachFeature: pop_Logradouros_6,
+                styles: [style_Logradouros_6_0, style_Logradouros_6_1]
+            });
+            
+            layer_Logradouros_6 = newLayer;
+            
+            map.addLayer(layer_Logradouros_6);
+            
+            // Filter and update Terreno layer
+            if (map.hasLayer(layer_Terreno_Niteroi_1)) {
+                map.removeLayer(layer_Terreno_Niteroi_1);
+            }
+            
+            var filteredTerreno = filterFeaturesByDate(originalFeatures_Terreno);
+            
+            var newTerrenoLayer = new L.geoJson({
+                type: "FeatureCollection",
+                features: filteredTerreno
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Terreno_Niteroi_1',
+                layerName: 'layer_Terreno_Niteroi_1',
+                pane: 'pane_Terreno_Niteroi_1',
+                onEachFeature: pop_Terreno_Niteroi_1,
+                style: style_Terreno_Niteroi_1_0
+            });
+            
+            layer_Terreno_Niteroi_1 = newTerrenoLayer;
+            map.addLayer(layer_Terreno_Niteroi_1);
+            
+            // Filter and update Area Urbana layer
+            if (map.hasLayer(layer_Area_Urbana_4)) {
+                map.removeLayer(layer_Area_Urbana_4);
+            }
+            
+            var filteredArea = filterFeaturesByDate(originalFeatures_Area);
+            
+            var newAreaLayer = new L.geoJson({
+                type: "FeatureCollection",
+                features: filteredArea
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_Area_Urbana_4',
+                layerName: 'layer_Area_Urbana_4',
+                pane: 'pane_Area_Urbana_4',
+                onEachFeature: pop_Area_Urbana_4,
+                style: style_Area_Urbana_4_0
+            });
+            
+            layer_Area_Urbana_4 = newAreaLayer;
+            map.addLayer(layer_Area_Urbana_4);
+            
+            // Filter and update Edificios Historicos layer
+            if (map.hasLayer(layer_EdifciosHistricos_7)) {
+                map.removeLayer(layer_EdifciosHistricos_7);
+            }
+            
+            var filteredEdificios = filterFeaturesByDate(originalFeatures_Edificios);
+            
+            var newEdificiosLayer = new L.geoJson({
+                type: "FeatureCollection",
+                features: filteredEdificios
+            }, {
+                attribution: '',
+                interactive: true,
+                dataVar: 'json_EdifciosHistricos_7',
+                layerName: 'layer_EdifciosHistricos_7',
+                pane: 'pane_EdifciosHistricos_7',
+                onEachFeature: pop_EdifciosHistricos_7,
+                style: style_EdifciosHistricos_7_0
+            });
+            
+            layer_EdifciosHistricos_7 = newEdificiosLayer;
+            map.addLayer(layer_EdifciosHistricos_7);
+            
+            // Reset labels for all filtered layers
+            resetLabels([layer_Logradouros_6, layer_Terreno_Niteroi_1, layer_Area_Urbana_4, layer_EdifciosHistricos_7]);
+        }
+        createLabels();
+        updateYear(document.getElementById('timeline').value);
 		
     </script>
 		<style>
 			#timeline { 
             width: 100%;
             margin: 10px 0;
-			}
-			
-			.loading-indicator {
-				background: rgba(255, 255, 255, 0.8);
-				padding: 10px;
-				border-radius: 5px;
-				box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-				display: flex;
-				align-items: center;
-				font-family: Arial, sans-serif;
-				font-size: 14px;
-			}
-			
-			.spinner {
-				border: 3px solid #f3f3f3;
-				border-top: 3px solid #3498db;
-				border-radius: 50%;
-				width: 16px;
-				height: 16px;
-				animation: spin 1s linear infinite;
-				margin-right: 8px;
-			}
-			
-			@keyframes spin {
-				0% { transform: rotate(0deg); }
-				100% { transform: rotate(360deg); }
 			}
 		</style>
 		</div>	
