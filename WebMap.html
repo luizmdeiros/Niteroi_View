@@ -24,19 +24,21 @@
         /* Mobile-specific styles */
         @media (max-width: 767px) {
             #timeline_div {
-                padding: 10px 5px;
+                padding: 20px 15px 30px;
+                margin: 20px 0;
             }
             
             .year-label {
                 text-align: center;
-                margin-bottom: 10px;
-                font-size: 16px;
+                margin-bottom: 20px;
+                font-size: 18px;
                 font-weight: bold;
             }
             
             .slider-container {
                 width: 100%;
-                padding: 0 5px;
+                padding: 0 10px;
+                margin: 0 15px;
             }
             
             .leaflet-control-layers {
@@ -1010,34 +1012,35 @@
 			 <style>
 			#timeline_div {
 				width: 100%;
-				padding: 10px 15px 20px;
+				padding: 15px 20px 25px;
 				background-color: #f8f9fa;
 				border-radius: 8px;
 				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-				margin: 10px 0;
+				margin: 15px 0;
 				box-sizing: border-box;
 			}
 			
 			.year-label {
 				font-family: Arial, sans-serif;
-				font-size: 14px;
+				font-size: 16px;
 				color: #555;
 				margin-bottom: 15px;
 				font-weight: bold;
+				text-align: center;
 			}
 			
 			.slider-container {
 				position: relative;
-				padding: 0 5px;
-				margin: 0 10px;
+				padding: 0 10px;
+				margin: 0 15px;
 			}
 			
 			#timeline { 
-				width: calc(100% - 18px);
-				margin: 10px 9px;
+				width: calc(100% - 30px);
+				margin: 15px 15px;
 				-webkit-appearance: none;
 				appearance: none;
-				height: 6px;
+				height: 8px;
 				background: linear-gradient(to right, #cfe2f3, #9fc5e8, #6fa8dc);
 				border-radius: 5px;
 				outline: none;
@@ -1047,8 +1050,8 @@
 			#timeline::-webkit-slider-thumb {
 				-webkit-appearance: none;
 				appearance: none;
-				width: 18px;
-				height: 18px;
+				width: 28px;
+				height: 28px;
 				border-radius: 50%;
 				background: #3d85c6;
 				border: 2px solid #fff;
@@ -1057,8 +1060,8 @@
 			}
 			
 			#timeline::-moz-range-thumb {
-				width: 18px;
-				height: 18px;
+				width: 28px;
+				height: 28px;
 				border-radius: 50%;
 				background: #3d85c6;
 				border: 2px solid #fff;
@@ -1069,10 +1072,11 @@
 			.labels {
 				display: flex;
 				justify-content: space-between;
-				margin-top: 5px;
+				flex-wrap: wrap;
+				margin-top: 10px;
 				padding: 0;
-				width: calc(100% - 18px);
-				margin-left: 9px;
+				width: calc(100% - 30px);
+				margin-left: 15px;
 			}
 			
 			.labels span {
@@ -1081,6 +1085,7 @@
 				color: #777;
 				position: relative;
 				text-align: center;
+				margin-bottom: 5px;
 			}
 			
 			.labels span::before {
@@ -1092,6 +1097,48 @@
 				width: 1px;
 				height: 8px;
 				background-color: #aaa;
+			}
+			
+			/* Mobile-specific timeline adjustments */
+			@media (max-width: 767px) {
+				#timeline_div {
+					padding: 20px 15px 30px;
+					margin: 20px 0;
+				}
+				
+				.year-label {
+					font-size: 18px;
+					margin-bottom: 20px;
+				}
+				
+				#timeline {
+					height: 10px;
+					margin: 20px 15px;
+				}
+				
+				#timeline::-webkit-slider-thumb {
+					width: 34px;
+					height: 34px;
+				}
+				
+				#timeline::-moz-range-thumb {
+					width: 34px;
+					height: 34px;
+				}
+				
+				.labels {
+					margin-top: 15px;
+				}
+				
+				.labels span {
+					font-size: 14px;
+					margin: 0 2px 8px;
+				}
+				
+				/* Show fewer labels on small screens */
+				.labels span:nth-child(odd):not(:first-child):not(:last-child) {
+					display: none;
+				}
 			}
 		</style>
 		<script>
@@ -1131,34 +1178,29 @@
                         var dataAbertura = null;
                         var dataFechamento = null;
                         
-                        if (dataAbertStr) {
-                            if (typeof dataAbertStr === 'number') {
-                                dataAbertura = dataAbertStr;
-                            } else if (dataAbertStr.match(/^\d{4}$/)) {
-                                dataAbertura = parseInt(dataAbertStr);
-                            } else if (dataAbertStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                                dataAbertura = parseInt(dataAbertStr.substring(0, 4));
-                            } else {
-                                var date = new Date(dataAbertStr);
-                                if (!isNaN(date.getTime())) {
-                                    dataAbertura = date.getFullYear();
-                                }
-                            }
+                        // Cache for parsed dates
+                        if (!feature._parsedDates) {
+                            feature._parsedDates = {};
                         }
                         
-                        if (dataFechaStr) {
-                            if (typeof dataFechaStr === 'number') {
-                                dataFechamento = dataFechaStr;
-                            } else if (dataFechaStr.match(/^\d{4}$/)) {
-                                dataFechamento = parseInt(dataFechaStr);
-                            } else if (dataFechaStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                                dataFechamento = parseInt(dataFechaStr.substring(0, 4));
-                            } else {
-                                var date = new Date(dataFechaStr);
-                                if (!isNaN(date.getTime())) {
-                                    dataFechamento = date.getFullYear();
-                                }
-                            }
+                        var dataAbertura, dataFechamento;
+                        
+                        // Use cached parsed dates if available
+                        if (feature._parsedDates.abertura !== undefined) {
+                            dataAbertura = feature._parsedDates.abertura;
+                        } else {
+                            dataAbertura = parseYearFromDate(dataAbertStr);
+                            feature._parsedDates.abertura = dataAbertura;
+                        }
+                        
+                        if (feature._parsedDates.fechamento !== undefined) {
+                            dataFechamento = feature._parsedDates.fechamento;
+                        } else if (dataFechaStr) {
+                            dataFechamento = parseYearFromDate(dataFechaStr);
+                            feature._parsedDates.fechamento = dataFechamento;
+                        } else {
+                            dataFechamento = null;
+                            feature._parsedDates.fechamento = null;
                         }
                         
                         // If we couldn't parse the opening date, always show the feature
@@ -1173,6 +1215,25 @@
                         return true;
                     }
                 });
+            }
+            
+            // Helper function to parse year from various date formats - extracted for better performance
+            function parseYearFromDate(dateStr) {
+                if (!dateStr) return null;
+                
+                if (typeof dateStr === 'number') {
+                    return dateStr;
+                } else if (dateStr.match(/^\d{4}$/)) {
+                    return parseInt(dateStr);
+                } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    return parseInt(dateStr.substring(0, 4));
+                } else {
+                    var date = new Date(dateStr);
+                    if (!isNaN(date.getTime())) {
+                        return date.getFullYear();
+                    }
+                }
+                return null;
             }
             
             // Filter and update Logradouros layer
