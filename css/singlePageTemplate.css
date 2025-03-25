@@ -359,6 +359,9 @@ input[type="range"]:focus::-moz-range-thumb {
 	display: none;
 }
 header nav ul {
+	padding: 0;
+	margin: 0;
+	width: 100%;
 }
 nav ul li {
 	margin-top: 0px;
@@ -555,6 +558,110 @@ nav ul li {
 	margin-top: 0px;
 	padding-top: 0px;
 }
+}
+
+/* Mobile Navigation Menu */
+@media (max-width: 767px) {
+  header {
+    height: auto;
+    position: relative;
+  }
+  
+  .logo {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+    padding: 0;
+    float: none;
+  }
+  
+  nav {
+    width: 100%;
+    float: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+  
+  header nav ul {
+    float: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+  }
+  
+  nav ul li {
+    float: none;
+    display: inline-block;
+    width: auto;
+    margin: 0 10px 10px;
+  }
+  
+  /* Map adjustments for mobile */
+  #map {
+    height: 70vh !important;
+  }
+  
+  /* Timeline slider adjustments */
+  .timeline-container {
+    width: 100%;
+    padding: 0 10px;
+  }
+  
+  input[type="range"] {
+    width: 100%;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+  }
+  
+  /* Hero section adjustments */
+  .hero {
+    height: 80vh;
+    background-attachment: scroll;
+  }
+  
+  /* Improve footer for mobile */
+  .footer_column {
+    width: 100%;
+    float: none;
+    margin-bottom: 20px;
+  }
+  
+  .cards {
+    max-width: 90%;
+  }
+  
+  /* Support logos in footer */
+  .footer_banner img {
+    max-width: 80%;
+    height: auto;
+    margin: 10px;
+  }
+}
+
+/* Tablet improvements */
+@media (min-width: 768px) and (max-width: 1096px) {
+  .hero {
+    background-attachment: scroll;
+  }
+  
+  #map {
+    height: 75vh !important;
+  }
+  
+  .footer_banner img {
+    max-width: 150px;
+    height: auto;
+    margin: 10px;
+  }
 }
 
 .scroll-arrow {
