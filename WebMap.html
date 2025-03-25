@@ -35,7 +35,7 @@
     </a>
 	<nav>
       <ul>
-        <li><a href="Index.html">HOME</a></li>
+        <li><a href="index.html">HOME</a></li>
         <li><a href="#about">SOBRE</a></li>
         <li><a href="#contact">CONTATO</a></li>
       </ul>
@@ -525,16 +525,9 @@
             {label: '<img src="legend/Lagunas_2.png" /> Lagunas', layer: layer_Lagunas_2},
             {label: 'Terreno_Niteroi<br /><table><tr><td style="text-align: center;"><img src="legend/Terreno_Niteroi_1_Terra0.png" /></td><td>Terra</td></tr><tr><td style="text-align: center;"><img src="legend/Terreno_Niteroi_1_Areia1.png" /></td><td>Areia</td></tr></table>', layer: layer_Terreno_Niteroi_1},
             {label: '<img src="legend/Agua_Niteroi_0.png" /> Agua_Niteroi', layer: layer_Agua_Niteroi_0},]
-        var lay = L.control.layers.tree(null, overlaysTree,{
-            //namedToggle: true,
-            //selectorBack: false,
-            //closedSymbol: '&#8862; &#x1f5c0;',
-            //openedSymbol: '&#8863; &#x1f5c1;',
-            //collapseAll: 'Collapse all',
-            //expandAll: 'Expand all',
-            collapsed: true,
-        });
-        lay.addTo(map);
+        // Layer control has been disabled
+        // All layers will remain visible at all times
+        
         map.on("zoomend", function(){
 
                 if (map.hasLayer(layer_Logradouros_6)) {
@@ -983,9 +976,9 @@
         };
         </script>
 			 <div id="timeline_div">
-			    <div class="year-label">Year: <span id="year">1820</span></div>
+			    <div class="year-label">Year: <span id="year">2020</span></div>
 			    <div class="slider-container">
-			        <input type="range" id="timeline" min="1820" max="2020" value="1820" step="10" oninput="updateYear(this.value)">
+			        <input type="range" id="timeline" min="1820" max="2020" value="2020" step="10" oninput="updateYear(this.value)">
 			        <div class="labels" id="labels"></div>
 			    </div>
 			 </div>
