@@ -341,14 +341,7 @@ input[type="range"]:focus::-moz-range-thumb {
 
 /* Mobile */
 @media (max-width: 320px) {
-.logo {
-	width: 100%;
-	text-align: center;
-	margin-top: 13px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-}
+
 .container header nav {
 	margin-top: 0px;
 	margin-right: 0px;
@@ -433,9 +426,9 @@ nav ul li {
 .logo {
 	width: 100%;
 	text-align: center;
-	margin-top: 13px;
+	margin-top: 10px;
 	margin-right: 0px;
-	margin-bottom: 0px;
+	margin-bottom: 2px;
 	margin-left: 0px;
 	color: #0072C5;
 }

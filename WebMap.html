@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
     <head>
+          <!-- Basic meta tags for character encoding and responsive design -->
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
@@ -20,32 +21,6 @@
         }
 		.labels { display: flex; justify-content: space-between; flex-wrap: wrap; }
         .labels span { margin: 0 5px; }
-        
-        /* Mobile-specific styles */
-        @media (max-width: 767px) {
-            #timeline_div {
-                padding: 20px 15px 30px;
-                margin: 20px 0;
-            }
-            
-            .year-label {
-                text-align: center;
-                margin-bottom: 20px;
-                font-size: 18px;
-                font-weight: bold;
-            }
-            
-            .slider-container {
-                width: 100%;
-                padding: 0 10px;
-                margin: 0 15px;
-            }
-            
-            .leaflet-control-layers {
-                max-height: 70vh;
-                overflow-y: auto;
-            }
-        }
         </style>
         <title>Mapa Temporal com Controle Deslizante</title>
     </head>
@@ -69,6 +44,8 @@
     </header>
         <div id="map">
         </div>
+
+        <!-- JavaScript libraries for map functionality -->
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -80,6 +57,8 @@
         <script src="js/rbush.min.js"></script>
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
+
+        <!-- GeoJSON data sources for map layers -->
         <script src="data/Agua_Niteroi_0.js"></script>
         <script src="data/Terreno_Niteroi_1.js"></script>
         <script src="data/Lagunas_2.js"></script>
@@ -88,6 +67,8 @@
         <script src="data/Logradouros_6.js"></script>
         <script src="data/EdifciosHistricos_7.js"></script>
         <script>
+
+        // Cache version for browser caching
         const CACHE_VERSION = 'v1';
         const CACHE_NAME = `webmap-data-${CACHE_VERSION}`;
         
@@ -101,16 +82,19 @@
         
         // Create a cache for filtered layers
         var layerCache = {};
-        
+
+        // Cache the Logradouros data for faster loading         
         if ('caches' in window) {
             caches.open(CACHE_NAME).then(cache => {
                 cache.add('data/Logradouros_6.js');
             });
         }
-        
+        // Initialize map hash for URL-based navigation
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        
+        // Function to remove empty rows from popup content
         function removeEmptyRowsFromPopupContent(content, feature) {
          var tempDiv = document.createElement('div');
          tempDiv.innerHTML = content;
@@ -124,6 +108,8 @@
          }
          return tempDiv.innerHTML;
         }
+        
+        // Function to add media class to popup content if it contains an image
         function addClassToPopupIfMedia(content, popup) {
             var tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
@@ -136,6 +122,8 @@
                 popup._contentNode.classList.remove('media');
             }
         }
+        
+        // Add zoom control to the map
         var zoomControl = L.control.zoom({
             position: 'topleft'
         }).addTo(map);
@@ -160,6 +148,7 @@
             
             map.setMaxBounds(expandedBounds);
             
+        // Define the popup content function for the water layer (Agua_Niteroi)    
         function pop_Agua_Niteroi_0(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -1012,11 +1001,9 @@
 			 <style>
 			#timeline_div {
 				width: 100%;
-				padding: 15px 20px 25px;
+				padding: 15px 10px 10px;
 				background-color: #f8f9fa;
-				border-radius: 8px;
 				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-				margin: 15px 0;
 				box-sizing: border-box;
 			}
 			
@@ -1037,7 +1024,6 @@
 			
 			#timeline { 
 				width: calc(100% - 30px);
-				margin: 15px 15px;
 				-webkit-appearance: none;
 				appearance: none;
 				height: 8px;
@@ -1102,8 +1088,7 @@
 			/* Mobile-specific timeline adjustments */
 			@media (max-width: 767px) {
 				#timeline_div {
-					padding: 20px 15px 30px;
-					margin: 20px 0;
+					padding: 10px 10px 10px;
 				}
 				
 				.year-label {
@@ -1117,17 +1102,17 @@
 				}
 				
 				#timeline::-webkit-slider-thumb {
-					width: 34px;
-					height: 34px;
+					width: 30px;
+					height: 30px;
 				}
 				
 				#timeline::-moz-range-thumb {
-					width: 34px;
-					height: 34px;
+					width: 30px;
+					height: 30px;
 				}
 				
 				.labels {
-					margin-top: 15px;
+					margin-top: 0px;
 				}
 				
 				.labels span {
@@ -1336,12 +1321,6 @@
         updateYear(document.getElementById('timeline').value);
 		
     </script>
-		<style>
-			#timeline { 
-            width: 100%;
-            margin: 10px 0;
-			}
-		</style>
 		</div>	
     </body>
 </html>
