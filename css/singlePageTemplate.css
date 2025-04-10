@@ -29,7 +29,7 @@ header {
 	color: #fff;
 	font-weight: bold;
 	text-align: left;
-	width: 20%;
+	width: 25%;
 	float: left;
 	margin-top: 15px;
 	margin-left: 40px;
@@ -267,21 +267,18 @@ footer {
 .hidden {
 	display: none;
 }
-
 /* Timeline Container Styles */
 .timeline-container {
   width: 90%;
   margin: 20px auto;
   padding: 0 20px;
 }
-
 .labels {
   margin: 10px 0;
   padding: 0 10px;
   color: #333;
   font-size: 14px;
 }
-
 /* Timeline Slider Styles */
 input[type="range"] {
   -webkit-appearance: none;
@@ -421,111 +418,207 @@ nav ul li {
 }
 }
 
-/* Small Tablets */
-@media (min-width: 321px)and (max-width: 767px) {
-.logo {
-	width: 100%;
-	text-align: center;
-	margin-top: 10px;
-	margin-right: 0px;
-	margin-bottom: 2px;
-	margin-left: 0px;
-	color: #0072C5;
+/* Hamburger menu is hidden by default */
+.hamburger {
+  display: none;
 }
-.container header nav {
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	width: 100%;
-	float: none;
-	overflow: auto;
-	display: inline-block;
-	background: #0072C5;
-}
-header nav ul {
-	padding: 0px;
-	float: none;
-}
-nav ul li {
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	width: 100%;
-	text-align: center;
-	padding-top: 8px;
-	padding-bottom: 8px;
-}
-.text_column {
-	width: 100%;
-	text-align: left;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-}
-.thumbnail {
-	width: 100%;
-}
-.footer_column {
-	width: 100%;
-	margin-top: 0px;
-}
-.parallax {
-	text-align: center;
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	padding-top: 40%;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-	width: 100%;
-	font-size: 18px;
-}
-.parallax_description {
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-	margin-top: 30%;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	float: none;
-	width: 100%;
-	text-align: center;
-}
-.thumbnail {
-	width: 50%;
-}
-.parallax {
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-	padding-top: 20%;
-}
-.parallax_description {
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	width: 100%;
-	padding-top: 30px;
-}
-.banner {
-	padding-left: 20px;
-	padding-right: 20px;
-}
-.footer_column {
-	width: 100%;
-}
+
+/* Hamburger Menu for small tablets */
+@media (min-width: 321px) and (max-width: 767px) {
+  /* Hide regular navigation menu items */
+  header nav ul {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background-color: #0072C5;
+    z-index: 1000;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* Show menu when hamburger is clicked */
+  header nav ul.show {
+    display: flex;
+  }
+  
+  /* Override the inline-block display from the wider media query */
+  nav ul li {
+    float: none;
+    display: block;
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  nav ul li:last-child {
+    border-bottom: none;
+  }
+  
+  /* Show hamburger icon only at this breakpoint */
+  .hamburger {
+    display: block;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 30px;
+    height: 22px;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  
+  .hamburger span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: white;
+    border-radius: 3px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+  }
+  
+  .hamburger span:nth-child(1) {
+    top: 0px;
+  }
+  
+  .hamburger span:nth-child(2) {
+    top: 9px;
+  }
+  
+  .hamburger span:nth-child(3) {
+    top: 18px;
+  }
+  
+  /* Hamburger animation */
+  .hamburger.open span:nth-child(1) {
+    top: 9px;
+    transform: rotate(135deg);
+  }
+  
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+    left: -60px;
+  }
+  
+  .hamburger.open span:nth-child(3) {
+    top: 9px;
+    transform: rotate(-135deg);
+  }
+  
+  .logo {
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+    margin-left: 0px;
+  }
+  
+  .container header nav {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    width: 100%;
+    float: none;
+    overflow: auto;
+    display: inline-block;
+    background: #0072C5;
+  }
+  
+  nav {
+    width: 100%;
+    float: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+  
+  .text_column {
+    width: 100%;
+    text-align: left;
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+  }
+  
+  .thumbnail {
+    width: 100%;
+  }
+  
+  .footer_column {
+    width: 100%;
+    margin-top: 0px;
+  }
+  
+  .parallax {
+    text-align: center;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    padding-top: 40%;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    width: 100%;
+    font-size: 18px;
+  }
+  
+  .parallax_description {
+    padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    margin-top: 30%;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    float: none;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .thumbnail {
+    width: 50%;
+  }
+  
+  .parallax {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-top: 20%;
+  }
+  
+  .parallax_description {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    width: 100%;
+    padding-top: 30px;
+  }
+  
+  .banner {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .footer_column {
+    width: 100%;
+  }
 }
 
 /* Small Desktops */
@@ -551,93 +644,6 @@ nav ul li {
 	margin-top: 0px;
 	padding-top: 0px;
 }
-}
-
-/* Mobile Navigation Menu */
-@media (max-width: 767px) {
-  header {
-    height: auto;
-    position: relative;
-  }
-  
-  .logo {
-    width: 100%;
-    text-align: center;
-    margin: 10px 0;
-    padding: 0;
-    float: none;
-  }
-  
-  nav {
-    width: 100%;
-    float: none;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-    display: block;
-  }
-  
-  header nav ul {
-    float: none;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-  }
-  
-  nav ul li {
-    float: none;
-    display: inline-block;
-    width: auto;
-    margin: 0 10px 10px;
-  }
-  
-  /* Map adjustments for mobile */
-  #map {
-    height: 70vh !important;
-  }
-  
-  /* Timeline slider adjustments */
-  .timeline-container {
-    width: 100%;
-    padding: 0 10px;
-  }
-  
-  input[type="range"] {
-    width: 100%;
-  }
-  
-  input[type="range"]::-webkit-slider-thumb {
-    width: 20px;
-  }
-  
-  input[type="range"]::-moz-range-thumb {
-    width: 20px;
-  }
-  
-  /* Hero section adjustments */
-  .hero {
-    height: 80vh;
-    background-attachment: scroll;
-  }
-  
-  /* Improve footer for mobile */
-  .footer_column {
-    width: 100%;
-    float: none;
-    margin-bottom: 20px;
-  }
-  
-  .cards {
-    max-width: 90%;
-  }
-  
-  /* Support logos in footer */
-  .footer_banner img {
-    max-width: 80%;
-    height: auto;
-    margin: 10px;
-  }
 }
 
 /* Tablet improvements */

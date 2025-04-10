@@ -27,14 +27,19 @@
     <body>
 		<div class="container"> 
   		<header> 
-		<a href="PDPA.htm">
+		<a href="index.html">
     	<div>
-      		<h4 class="logo">
+      		<h4 class="logo" a href="index.html">
 			 	NITERÓI VIEW
 			</h4>
     	</div>
     </a>
 	<nav>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <ul>
         <li><a href="index.html">HOME</a></li>
         <li><a href="#about">SOBRE</a></li>
@@ -1112,7 +1117,7 @@
 				}
 				
 				.labels {
-					margin-top: 0px;
+					margin-top: 15px;
 				}
 				
 				.labels span {
@@ -1322,5 +1327,31 @@
 		
     </script>
 		</div>	
+    <script>
+      // Hamburger menu toggle - improved implementation
+      document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('header nav ul');
+        
+        if (hamburger && navMenu) {
+          hamburger.addEventListener('click', function() {
+            console.log('Hamburger clicked');
+            this.classList.toggle('open');
+            navMenu.classList.toggle('show');
+          });
+          
+          // Close menu when clicking on a link
+          const navLinks = document.querySelectorAll('nav ul li a');
+          navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+              hamburger.classList.remove('open');
+              navMenu.classList.remove('show');
+            });
+          });
+        } else {
+          console.error('Hamburger menu elements not found');
+        }
+      });
+    </script>
     </body>
 </html>
