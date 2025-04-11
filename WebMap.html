@@ -663,7 +663,6 @@
         // Add debouncing to prevent excessive rendering during slider movement
         var debounceTimer;
         function debouncedUpdateYear(value) {
-            document.getElementById('year').textContent = value;
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function() {
                 updateYear(value);
@@ -671,6 +670,7 @@
         }
 
         function updateYear(value) {
+            document.getElementById('year').textContent = value;
             var selectedYear = parseInt(value);
             
             // Check if we have a cached layer for this year
@@ -697,15 +697,20 @@
                 return;
             }
             
-            // Helper function to filter features by date - optimized version
+            // Helper function to filter features by date
             function filterFeaturesByDate(features) {
                 return features.filter(function(feature) {
                     try {
                         var dataAbertStr = feature.properties.Data_abert || feature.properties.data_abert || feature.properties.Data_Abert;
                         var dataFechaStr = feature.properties.Data_fecha || feature.properties.data_fecha || feature.properties.Data_Fecha;
                         
-                        // Quick early returns for common cases
-                        if (!dataAbertStr) return true;
+                        // If opening date is null/empty, always show the feature
+                        if (!dataAbertStr) {
+                            return true;
+                        }
+                        
+                        var dataAbertura = null;
+                        var dataFechamento = null;
                         
                         // Cache for parsed dates
                         if (!feature._parsedDates) {
@@ -735,8 +740,10 @@
                         // If we couldn't parse the opening date, always show the feature
                         if (!dataAbertura) return true;
                          
-                        return (dataAbertura <= selectedYear) && 
+                        var isVisible = (dataAbertura <= selectedYear) && 
                                (!dataFechamento || selectedYear <= dataFechamento);
+                        
+                        return isVisible;
                     } catch (e) {
                         // If there's any error in parsing, show the feature
                         return true;
@@ -802,6 +809,7 @@
             
             var filteredTerreno = filterFeaturesByDate(originalFeatures_Terreno);
             
+            // Apply simplification if needed
             if (simplifyTolerance > 0) {
                 filteredTerreno = simplifyFeatures(filteredTerreno, simplifyTolerance);
             }
@@ -829,6 +837,7 @@
             
             var filteredArea = filterFeaturesByDate(originalFeatures_Area);
             
+            // Apply simplification if needed
             if (simplifyTolerance > 0) {
                 filteredArea = simplifyFeatures(filteredArea, simplifyTolerance);
             }
@@ -856,6 +865,11 @@
             
             var filteredEdificios = filterFeaturesByDate(originalFeatures_Edificios);
             
+            // Apply simplification if needed
+            if (simplifyTolerance > 0) {
+                filteredEdificios = simplifyFeatures(filteredEdificios, simplifyTolerance);
+            }
+            
             var newEdificiosLayer = new L.geoJson({
                 type: "FeatureCollection",
                 features: filteredEdificios
@@ -872,19 +886,13 @@
             layer_EdifciosHistricos_7 = newEdificiosLayer;
             map.addLayer(layer_EdifciosHistricos_7);
             
-            // Cache the layers for this year
+            // Store in cache for future use
             layerCache[cacheKey] = {
                 logradouros: layer_Logradouros_6,
                 terreno: layer_Terreno_Niteroi_1,
                 area: layer_Area_Urbana_4,
                 edificios: layer_EdifciosHistricos_7
             };
-            
-            // Limit cache size to prevent memory issues
-            var cacheKeys = Object.keys(layerCache);
-            if (cacheKeys.length > 10) { // Keep only 10 years in cache
-                delete layerCache[cacheKeys[0]];
-            }
             
             // Reset labels for all filtered layers
             resetLabels([layer_Logradouros_6, layer_Terreno_Niteroi_1, layer_Area_Urbana_4, layer_EdifciosHistricos_7]);
@@ -995,7 +1003,7 @@
         document.getElementById('timeline').oninput = function() {
             debouncedUpdateYear(this.value);
         };
-        </script>
+     </script>
 			 <div id="timeline_div">
 			    <div class="year-label">Year: <span id="year">2020</span></div>
 			    <div class="slider-container">
@@ -1138,7 +1146,7 @@
             labelsDiv.innerHTML = ''; 
             
             // Define key years to display (matching the data range 1820-2020)
-            var years = [1820, 1870, 1920, 1970, 2020];
+            var years = [1820, 1840, 1860, 1880, 1900, 1920, 1940, 1960, 1980, 2000, 2020];
             
             // Create a label for each year
             years.forEach(function(year) {
@@ -1148,181 +1156,7 @@
             });
         }
 
-        function updateYear(value) {
-            document.getElementById('year').textContent = value;
-            var selectedYear = parseInt(value);
-            
-            // Helper function to filter features by date
-            function filterFeaturesByDate(features) {
-                return features.filter(function(feature) {
-                    try {
-                        var dataAbertStr = feature.properties.Data_abert || feature.properties.data_abert || feature.properties.Data_Abert;
-                        var dataFechaStr = feature.properties.Data_fecha || feature.properties.data_fecha || feature.properties.Data_Fecha;
-                        
-                        // If opening date is null/empty, always show the feature
-                        if (!dataAbertStr) {
-                            return true;
-                        }
-                        
-                        var dataAbertura = null;
-                        var dataFechamento = null;
-                        
-                        // Cache for parsed dates
-                        if (!feature._parsedDates) {
-                            feature._parsedDates = {};
-                        }
-                        
-                        var dataAbertura, dataFechamento;
-                        
-                        // Use cached parsed dates if available
-                        if (feature._parsedDates.abertura !== undefined) {
-                            dataAbertura = feature._parsedDates.abertura;
-                        } else {
-                            dataAbertura = parseYearFromDate(dataAbertStr);
-                            feature._parsedDates.abertura = dataAbertura;
-                        }
-                        
-                        if (feature._parsedDates.fechamento !== undefined) {
-                            dataFechamento = feature._parsedDates.fechamento;
-                        } else if (dataFechaStr) {
-                            dataFechamento = parseYearFromDate(dataFechaStr);
-                            feature._parsedDates.fechamento = dataFechamento;
-                        } else {
-                            dataFechamento = null;
-                            feature._parsedDates.fechamento = null;
-                        }
-                        
-                        // If we couldn't parse the opening date, always show the feature
-                        if (!dataAbertura) return true;
-                         
-                        var isVisible = (dataAbertura <= selectedYear) && 
-                               (!dataFechamento || selectedYear <= dataFechamento);
-                        
-                        return isVisible;
-                    } catch (e) {
-                        // If there's any error in parsing, show the feature
-                        return true;
-                    }
-                });
-            }
-            
-            // Helper function to parse year from various date formats - extracted for better performance
-            function parseYearFromDate(dateStr) {
-                if (!dateStr) return null;
-                
-                if (typeof dateStr === 'number') {
-                    return dateStr;
-                } else if (dateStr.match(/^\d{4}$/)) {
-                    return parseInt(dateStr);
-                } else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    return parseInt(dateStr.substring(0, 4));
-                } else {
-                    var date = new Date(dateStr);
-                    if (!isNaN(date.getTime())) {
-                        return date.getFullYear();
-                    }
-                }
-                return null;
-            }
-            
-            // Filter and update Logradouros layer
-            if (map.hasLayer(layer_Logradouros_6)) {
-                map.removeLayer(layer_Logradouros_6);
-            }
-            
-            var filteredFeatures = filterFeaturesByDate(originalFeatures);
-            
-            var newLayer = new L.geoJson.multiStyle({
-                type: "FeatureCollection",
-                features: filteredFeatures
-            }, {
-                attribution: '',
-                interactive: true,
-                dataVar: 'json_Logradouros_6',
-                layerName: 'layer_Logradouros_6',
-                pane: 'pane_Logradouros_6',
-                onEachFeature: pop_Logradouros_6,
-                styles: [style_Logradouros_6_0, style_Logradouros_6_1]
-            });
-            
-            layer_Logradouros_6 = newLayer;
-            
-            map.addLayer(layer_Logradouros_6);
-            
-            // Filter and update Terreno layer
-            if (map.hasLayer(layer_Terreno_Niteroi_1)) {
-                map.removeLayer(layer_Terreno_Niteroi_1);
-            }
-            
-            var filteredTerreno = filterFeaturesByDate(originalFeatures_Terreno);
-            
-            var newTerrenoLayer = new L.geoJson({
-                type: "FeatureCollection",
-                features: filteredTerreno
-            }, {
-                attribution: '',
-                interactive: true,
-                dataVar: 'json_Terreno_Niteroi_1',
-                layerName: 'layer_Terreno_Niteroi_1',
-                pane: 'pane_Terreno_Niteroi_1',
-                onEachFeature: pop_Terreno_Niteroi_1,
-                style: style_Terreno_Niteroi_1_0
-            });
-            
-            layer_Terreno_Niteroi_1 = newTerrenoLayer;
-            map.addLayer(layer_Terreno_Niteroi_1);
-            
-            // Filter and update Area Urbana layer
-            if (map.hasLayer(layer_Area_Urbana_4)) {
-                map.removeLayer(layer_Area_Urbana_4);
-            }
-            
-            var filteredArea = filterFeaturesByDate(originalFeatures_Area);
-            
-            var newAreaLayer = new L.geoJson({
-                type: "FeatureCollection",
-                features: filteredArea
-            }, {
-                attribution: '',
-                interactive: true,
-                dataVar: 'json_Area_Urbana_4',
-                layerName: 'layer_Area_Urbana_4',
-                pane: 'pane_Area_Urbana_4',
-                onEachFeature: pop_Area_Urbana_4,
-                style: style_Area_Urbana_4_0
-            });
-            
-            layer_Area_Urbana_4 = newAreaLayer;
-            map.addLayer(layer_Area_Urbana_4);
-            
-            // Filter and update Edificios Historicos layer
-            if (map.hasLayer(layer_EdifciosHistricos_7)) {
-                map.removeLayer(layer_EdifciosHistricos_7);
-            }
-            
-            var filteredEdificios = filterFeaturesByDate(originalFeatures_Edificios);
-            
-            var newEdificiosLayer = new L.geoJson({
-                type: "FeatureCollection",
-                features: filteredEdificios
-            }, {
-                attribution: '',
-                interactive: true,
-                dataVar: 'json_EdifciosHistricos_7',
-                layerName: 'layer_EdifciosHistricos_7',
-                pane: 'pane_EdifciosHistricos_7',
-                onEachFeature: pop_EdifciosHistricos_7,
-                style: style_EdifciosHistricos_7_0
-            });
-            
-            layer_EdifciosHistricos_7 = newEdificiosLayer;
-            map.addLayer(layer_EdifciosHistricos_7);
-            
-            // Reset labels for all filtered layers
-            resetLabels([layer_Logradouros_6, layer_Terreno_Niteroi_1, layer_Area_Urbana_4, layer_EdifciosHistricos_7]);
-        }
         createLabels();
-        updateYear(document.getElementById('timeline').value);
 		
     </script>
 		</div>	
