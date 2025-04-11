@@ -286,7 +286,7 @@ input[type="range"] {
   background: transparent;
   cursor: pointer;
   width: 95%;
-  margin: 15px auto;
+  margin: 0px auto;
   display: block;
 }
 
@@ -650,10 +650,6 @@ nav ul li {
 @media (min-width: 768px) and (max-width: 1096px) {
   .hero {
     background-attachment: scroll;
-  }
-  
-  #map {
-    height: 75vh !important;
   }
   
   .footer_banner img {

@@ -15,7 +15,7 @@
         <style>
         html, #map {
             width: 100%;
-            height: 80vh;
+            height: calc(100vh - 180px); /* Subtract header (40px) and timeline (80px) heights */
             padding: 0;
             margin: 0;
         }
@@ -29,7 +29,7 @@
   		<header> 
 		<a href="index.html">
     	<div>
-      		<h4 class="logo" a href="index.html">
+      		<h4 class="logo">
 			 	NITERÓI VIEW
 			</h4>
     	</div>
@@ -1028,7 +1028,6 @@
 			}
 			
 			#timeline { 
-				width: calc(100% - 30px);
 				-webkit-appearance: none;
 				appearance: none;
 				height: 8px;
