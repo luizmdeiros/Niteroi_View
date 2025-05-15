@@ -1007,7 +1007,7 @@
 			 <div id="timeline_div">
 			    <div class="year-label">Year: <span id="year">2020</span></div>
 			    <div class="slider-container">
-			        <input type="range" id="timeline" min="1820" max="2020" value="2020" step="10" oninput="updateYear(this.value)">
+			        <input type="range" id="timeline" min="1820" max="2020" value="2020" step="5" oninput="updateYear(this.value)">
 			        <div class="labels" id="labels"></div>
 			    </div>
 			 </div>
@@ -1031,18 +1031,28 @@
 			
 			.slider-container {
 				position: relative;
-				padding: 0 10px;
+				padding: 0;
 				margin: 0 15px;
+				width: calc(100% - 30px);
 			}
 			
 			#timeline { 
 				-webkit-appearance: none;
 				appearance: none;
 				height: 8px;
+				margin-bottom: 15px;
 				background: linear-gradient(to right, #cfe2f3, #9fc5e8, #6fa8dc);
 				border-radius: 5px;
 				outline: none;
 				box-sizing: border-box;
+				width: 100%;
+			}
+			
+			/* Remover contorno preto quando o slider está em foco */
+			#timeline:focus {
+				outline: none;
+				box-shadow: none;
+				-webkit-box-shadow: none;
 			}
 			
 			#timeline::-webkit-slider-thumb {
@@ -1070,11 +1080,12 @@
 			.labels {
 				display: flex;
 				justify-content: space-between;
-				flex-wrap: wrap;
-				margin-top: 10px;
+				flex-wrap: nowrap;
+				margin-top: 0;
 				padding: 0;
-				width: calc(100% - 30px);
-				margin-left: 15px;
+				width: 100%;
+				margin-left: 0;
+				position: relative;
 			}
 			
 			.labels span {
@@ -1083,18 +1094,36 @@
 				color: #777;
 				position: relative;
 				text-align: center;
-				margin-bottom: 5px;
+				padding-top: 12px;
 			}
 			
 			.labels span::before {
 				content: '';
 				position: absolute;
-				top: -15px;
+				top: 0;
 				left: 50%;
 				transform: translateX(-50%);
 				width: 1px;
 				height: 8px;
 				background-color: #aaa;
+			}
+			
+			/* Ajustes responsivos para a linha do tempo */
+			@media (max-width: 1200px) {
+				/* Ocultar anos que terminam em 5 em telas médias */
+				.labels span:nth-child(even) {
+					display: none;
+				}
+			}
+			
+			@media (max-width: 900px) {
+				/* Em telas menores, mostrar apenas a cada 20 anos */
+				.labels span {
+					display: none;
+				}
+				.labels span:nth-child(4n+1) {
+					display: block;
+				}
 			}
 			
 			/* Mobile-specific timeline adjustments */
@@ -1128,13 +1157,28 @@
 				}
 				
 				.labels span {
-					font-size: 14px;
+					font-size: 13px;
 					margin: 0 2px 8px;
 				}
 				
-				/* Show fewer labels on small screens */
-				.labels span:nth-child(odd):not(:first-child):not(:last-child) {
+				/* Em celulares, mostrar apenas a cada 40 anos para garantir que tudo fique em uma linha */
+				.labels span {
 					display: none;
+				}
+				.labels span:nth-child(8n+1) {
+					display: block;
+				}
+			}
+			
+			@media (max-width: 480px) {
+				/* Em telas muito pequenas, mostrar apenas o início, meio e fim */
+				.labels span {
+					display: none;
+				}
+				.labels span:first-child,
+				.labels span:nth-child(21),
+				.labels span:last-child {
+					display: block;
 				}
 			}
 		</style>
@@ -1145,8 +1189,8 @@
             var labelsDiv = document.getElementById('labels');
             labelsDiv.innerHTML = ''; 
             
-            // Define key years to display (matching the data range 1820-2020)
-            var years = [1820, 1840, 1860, 1880, 1900, 1920, 1940, 1960, 1980, 2000, 2020];
+            // Define key years to display (matching the data range 1820-2020, with 5-year intervals)
+            var years = [1820, 1825, 1830, 1835, 1840, 1845, 1850, 1855, 1860, 1865, 1870, 1875, 1880, 1885, 1890, 1895, 1900, 1905, 1910, 1915, 1920, 1925, 1930, 1935, 1940, 1945, 1950, 1955, 1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020];
             
             // Create a label for each year
             years.forEach(function(year) {
