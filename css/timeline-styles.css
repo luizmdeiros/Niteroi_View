@@ -138,17 +138,10 @@
         height: 30px;
     }
     
-    .labels {
-        margin-top: 15px;
-    }
-    
+    /* Em celulares, mostrar apenas a cada 40 anos para garantir que tudo fique em uma linha */
     .labels span {
         font-size: 13px;
         margin: 0 2px 8px;
-    }
-    
-    /* Em celulares, mostrar apenas a cada 40 anos para garantir que tudo fique em uma linha */
-    .labels span {
         display: none;
     }
     .labels span:nth-child(8n+1) {
