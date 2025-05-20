@@ -1,4 +1,4 @@
-#timeline_div {
+footer #timeline_div {
     width: 100%;
     padding: 10px 10px 10px;
     background-color: #f8f9fa;
@@ -33,7 +33,6 @@
     border-radius: 5px;
     outline: none;
     box-sizing: border-box;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     width: 100%;
 }
 
