@@ -1,9 +1,11 @@
 #timeline_div {
     width: 100%;
-    padding: 15px 10px 10px;
+    padding: 10px 10px 10px;
     background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
 }
 
 .year-label {
@@ -31,6 +33,7 @@
     border-radius: 5px;
     outline: none;
     box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     width: 100%;
 }
 
