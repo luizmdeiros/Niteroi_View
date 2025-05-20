@@ -30,6 +30,7 @@ header {
 	top: 0;
 	left: 0;
 	z-index: 1000;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 } /* z-index maior para garantir que o header fique acima do mapa */
 
 #map {
@@ -143,7 +144,6 @@ ul li:hover a {
 	display: inline-block;
 	width: 100%;
 	background-color: #FFFFFF;
-	/* [disabled]min-width: 400px;*/
 	padding-bottom: 35px;
 	padding-top: 0px;
 	margin-top: -5px;
@@ -155,6 +155,17 @@ ul li:hover a {
 	float: left;
 	margin-top: 35px;
 }
+@media (max-width: 767px) {
+  .thumbnail {
+    width: 50%;
+  }
+}
+@media (max-width: 480px) {
+  .thumbnail {
+    width: 100%;
+  }
+}
+
 .gallery .thumbnail h4 {
 	margin-top: 5px;
 	margin-right: 5px;
@@ -178,6 +189,15 @@ ul li:hover a {
 	background-size: cover;
 	background-repeat: no-repeat;
 }
+@media (max-width: 767px) {
+  .banner {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 0px;
+    padding-top: 0px;
+  }
+}
+
 .parallax {
 	color: #FFFFFF;
 	text-align: right;
@@ -199,6 +219,25 @@ ul li:hover a {
 	margin-bottom: 0px;
 	margin-left: 0px;
 }
+
+/* Responsividade para parallax */
+@media (max-width: 767px) {
+  .parallax {
+    text-align: center;
+    padding-right: 0px;
+    padding-top: 40%;
+    width: 100%;
+    font-size: 18px;
+  }
+  .parallax_description {
+    text-align: center;
+    width: 100%;
+    padding-right: 0px;
+    margin-top: 30%;
+    float: none;
+  }
+}
+
 /* More info */
 footer {
 	background-color: #FFFFFF;
@@ -210,6 +249,14 @@ footer {
 	padding-top: 30px;
 	float: left;
 }
+@media (max-width: 767px) {
+  .footer_column {
+    width: 100%;
+    margin-top: 0px;
+    float: none;
+  }
+}
+
 footer .footer_column h3 {
 	color: #B3B3B3;
 	text-align: center;
