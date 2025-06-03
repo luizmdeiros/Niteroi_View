@@ -36,6 +36,7 @@ header {
 #map {
 	display: block;
 	width: 100%;
+	height: calc(100vh - 50px);
 	position: relative;
 	z-index: 1;
 	box-sizing: border-box;
