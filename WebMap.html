@@ -282,6 +282,13 @@
   <script src="data/CurvasdeNvel_5.js"></script>
   <script src="data/Logradouros_6.js"></script>
   <script src="data/EdifciosHistricos_7.js"></script>
+  <script src="styles/Agua_Niteroi_0_style.js"></script>
+  <script src="styles/Terreno_Niteroi_1_style.js"></script>
+  <script src="styles/Lagunas_2_style.js"></script>
+  <script src="styles/Area_Urbana_4_style.js"></script>
+  <script src="styles/CurvasdeNvel_5_style.js"></script>
+  <script src="styles/Logradouros_6_style.js"></script>
+  <script src="styles/EdifciosHistricos_7_style.js"></script>
   <script>
     // Função para gerar ticks de anos responsivos
     function renderTimelineTicks() {
@@ -344,19 +351,6 @@
     const aguaSource = new ol.source.Vector({
       features: new ol.format.GeoJSON().readFeatures(json_Agua_Niteroi_0, {featureProjection: 'EPSG:3857'})
     });
-    function style_Agua_Niteroi_0(feature, resolution) {
-      var labelText = "";
-      var labelFont = "10px, sans-serif";
-      var labelFill = "#000000";
-      var bufferColor = "";
-      var bufferWidth = 0;
-      var placement = 'point';
-      return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(149,214,233,1.0)', width: 0.0}),
-        fill: new ol.style.Fill({color: 'rgba(152,218,238,1.0)'}),
-        text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-      })];
-    }
     const aguaLayer = new ol.layer.Vector({
       source: aguaSource,
       style: style_Agua_Niteroi_0,
@@ -365,39 +359,6 @@
 
     // Terreno (com timeline)
     let terrenoSource = new ol.source.Vector({});
-    function categories_Terreno_Niteroi_1(feature, value, size, resolution, labelText, labelFont, labelFill, bufferColor, bufferWidth, placement) {
-      var valueStr = (value !== null && value !== undefined) ? value.toString() : 'default';
-      switch(valueStr) {
-        case 'Terra':
-          return [ new ol.style.Style({
-            stroke: new ol.style.Stroke({color: 'rgba(225,249,227,0.792)', width: 0.0}),
-            fill: new ol.style.Fill({color: 'rgba(214,248,226,0.792)'}),
-            text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-          })];
-        case 'Areia':
-          return [ new ol.style.Style({
-            stroke: new ol.style.Stroke({color: 'rgba(225,249,227,0.792)', width: 0.0}),
-            fill: new ol.style.Fill({color: 'rgba(246,236,207,0.792)'}),
-            text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-          })];
-        default:
-          return [ new ol.style.Style({
-            stroke: new ol.style.Stroke({color: 'rgba(225,249,227,0.792)', width: 0.0}),
-            fill: new ol.style.Fill({color: 'rgba(214,248,226,0.792)'}),
-            text: createTextStyle(feature, resolution, labelText, labelFont, placement, bufferColor, bufferWidth)
-          })];
-      }
-    }
-    function style_Terreno_Niteroi_1(feature, resolution) {
-      var labelText = "";
-      var value = feature.get("Tipo");
-      var labelFont = "10px, sans-serif";
-      var labelFill = "#000000";
-      var bufferColor = "";
-      var bufferWidth = 0;
-      var placement = 'point';
-      return categories_Terreno_Niteroi_1(feature, value, 0, resolution, labelText, labelFont, labelFill, bufferColor, bufferWidth, placement);
-    }
     const terrenoLayer = new ol.layer.Vector({
       source: terrenoSource,
       style: style_Terreno_Niteroi_1,
@@ -408,19 +369,6 @@
     const lagunasSource = new ol.source.Vector({
       features: new ol.format.GeoJSON().readFeatures(json_Lagunas_2, {featureProjection: 'EPSG:3857'})
     });
-    function style_Lagunas_2(feature, resolution) {
-      var labelText = "";
-      var labelFont = "10px, sans-serif";
-      var labelFill = "#000000";
-      var bufferColor = "";
-      var bufferWidth = 0;
-      var placement = 'point';
-      return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(144,206,225,1.0)', width: 0.0}),
-        fill: new ol.style.Fill({color: 'rgba(152,218,238,1.0)'}),
-        text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-      })];
-    }
     const lagunasLayer = new ol.layer.Vector({
       source: lagunasSource,
       style: style_Lagunas_2,
@@ -429,19 +377,6 @@
 
     // Área Urbana (com timeline)
     let areaUrbanaSource = new ol.source.Vector({});
-    function style_Area_Urbana_4(feature, resolution) {
-      var labelText = "";
-      var labelFont = "10px, sans-serif";
-      var labelFill = "#000000";
-      var bufferColor = "";
-      var bufferWidth = 0;
-      var placement = 'point';
-      return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(219,219,219,1.0)', width: 0.0}),
-        fill: new ol.style.Fill({color: 'rgba(219,219,219,1.0)'}),
-        text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-      })];
-    }
     const areaUrbanaLayer = new ol.layer.Vector({
       source: areaUrbanaSource,
       style: style_Area_Urbana_4,
@@ -452,18 +387,6 @@
     const curvasSource = new ol.source.Vector({
       features: new ol.format.GeoJSON().readFeatures(json_CurvasdeNvel_5, {featureProjection: 'EPSG:3857'})
     });
-    function style_CurvasdeNvel_5(feature, resolution) {
-      var labelText = "";
-      var labelFont = "10px, sans-serif";
-      var labelFill = "#000000";
-      var bufferColor = "";
-      var bufferWidth = 0;
-      var placement = 'line';
-      return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(149,149,149,0.17)', width: 0.76, lineCap: 'square', lineJoin: 'bevel'}),
-        text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-      })];
-    }
     const curvasLayer = new ol.layer.Vector({
       source: curvasSource,
       style: style_CurvasdeNvel_5,
@@ -472,19 +395,6 @@
 
     // Edifícios Históricos (com timeline)
     let edifSource = new ol.source.Vector({});
-    function style_EdifciosHistricos_7(feature, resolution) {
-      var labelText = "";
-      var labelFont = "10px, sans-serif";
-      var labelFill = "#000000";
-      var bufferColor = "";
-      var bufferWidth = 0;
-      var placement = 'point';
-      return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(247,247,247,1.0)', width: 0.988}),
-        fill: new ol.style.Fill({color: 'rgba(150,150,150,1.0)'}),
-        text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
-      })];
-    }
     const edifLayer = new ol.layer.Vector({
       source: edifSource,
       style: style_EdifciosHistricos_7,
@@ -493,7 +403,7 @@
 
     // Logradouros (com timeline)
     let logradourosSource = new ol.source.Vector({});
-    function style_Logradouros_6(feature, resolution){
+    /*function style_Logradouros_6(feature, resolution){
     var labelText = "";
     var labelFont = "5.2px 'Arial', sans-serif";
     var labelFill = "#323232";
@@ -532,7 +442,7 @@
         stroke: new ol.style.Stroke({color: 'rgba(255,255,255,1.0)', lineDash: null, lineCap: 'round', lineJoin: 'round', width: 3.3744}),
         text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
     })];
-}
+    }*/
     let logradourosLayer = new ol.layer.Vector({
       source: logradourosSource,
       style: style_Logradouros_6,
