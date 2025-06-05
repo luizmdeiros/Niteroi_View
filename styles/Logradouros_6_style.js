@@ -20,7 +20,7 @@ var style_Logradouros_6 = function(feature, resolution) {
             }
         }
     }
-    if (permitido && resolution > 0 && resolution < 14) {
+    if (permitido) {
         // Calcular comprimento da linha em pixels
         var geom = feature.getGeometry();
         var coords = geom.getCoordinates();
@@ -41,12 +41,30 @@ var style_Logradouros_6 = function(feature, resolution) {
             });
         }
         var textLength = nome.length * 6.5;
-        if (lengthPx > textLength + 20) {
+        if (lengthPx > textLength + 40) {
             labelText = String(nome);
+        } else {
+            labelText = ""; // Não renderiza se não couber
         }
     }
+    // Ajuste de largura do traço por escala de referência
+    var strokeWidth = 3.3744; // padrão
+    if (typeof map !== 'undefined') {
+        var zoom = map.getView().getZoom();
+        if (zoom >= 15 && zoom <= 18) {
+            // Simula escala de referência 1:15000, largura QGIS 3.7px
+            var dpi = 96;
+            var metersPerUnit = 1; // EPSG:3857 já está em metros
+            var resolution = map.getView().getResolution();
+            var scale = resolution * 39.37 * dpi / metersPerUnit;
+            strokeWidth = 3.7 * (15000 / scale); // 3.7px na escala 1:15000
+        }
+        // Garante um valor mínimo para strokeWidth
+        if (strokeWidth < 0.5 || isNaN(strokeWidth)) strokeWidth = 0.5;
+        console.log('[Logradouros] zoom:', zoom, 'strokeWidth:', strokeWidth);
+    }
     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(255,255,255,1.0)', lineDash: null, lineCap: 'round', lineJoin: 'round', width: 3.3744}),
+        stroke: new ol.style.Stroke({color: 'rgba(255,255,255,1.0)', lineDash: null, lineCap: 'round', lineJoin: 'round', width: strokeWidth}),
         text: createTextStyle(feature, resolution, labelText, labelFont, labelFill, placement, bufferColor, bufferWidth)
     })];
 };
