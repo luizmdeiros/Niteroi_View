@@ -92,10 +92,15 @@ var style_Logradouros_6 = function(feature, resolution) {
         if (strokeWidth < 0.5 || isNaN(strokeWidth)) strokeWidth = 0.5;
         console.log('[Logradouros] zoom:', zoom, 'strokeWidth:', strokeWidth);
     }
+    // Define cor do traço para Túnel
+    var strokeColor = 'rgba(255,255,255,1.0)'; // padrão branco
+    if (nome && nome.startsWith('Túnel')) {
+        strokeColor = '#f5f2f5'; // cinza claro
+    }
     return [
         new ol.style.Style({
             stroke: new ol.style.Stroke({
-                color: 'rgba(255,255,255,1.0)',
+                color: strokeColor,
                 lineDash: null,
                 lineCap: 'round',
                 lineJoin: 'round',
