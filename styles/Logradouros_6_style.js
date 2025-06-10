@@ -3,7 +3,7 @@ var placement = 'point';
 
 var style_Logradouros_6 = function(feature, resolution) {
     var labelText = "";
-    var labelFont = "8px 'Arial', sans-serif";
+    var labelFont = "9px 'Arial', sans-serif";
     var labelFill = "#323232";
     var bufferColor = "";
     var bufferWidth = 0;
