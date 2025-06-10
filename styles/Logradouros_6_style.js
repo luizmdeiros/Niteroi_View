@@ -63,10 +63,17 @@ var style_Logradouros_6 = function(feature, resolution) {
         }
     }
     var textLength = nome && permitido ? nome.length * 8.5 : 0;
-    if (permitido && lengthPx > textLength + 40) {
+    var showLabels = false;
+    if (typeof map !== 'undefined') {
+        var zoom = map.getView().getZoom();
+        if (zoom >= 15) { // ajuste conforme desejado
+            showLabels = true;
+        }
+    }
+    if (permitido && lengthPx > textLength + 40 && showLabels) {
         labelText = String(nome);
     } else {
-        labelText = ""; // Não renderiza se não couber
+        labelText = ""; // Não renderiza se não couber ou se zoom for baixo
     }
 
     // Ajuste de largura do traço por escala de referência

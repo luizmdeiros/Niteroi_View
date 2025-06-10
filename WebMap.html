@@ -319,9 +319,15 @@
     setTimeout(renderTimelineTicks, 200);
     // Atualizar ticks ao carregar e ao mudar tamanho
     document.addEventListener('DOMContentLoaded', renderTimelineTicks);
-    // Função para filtrar ruas pelo ano
+    // --- CACHE DE FILTRAGEM TEMPORAL DOS LOGRADOUROS ---
+    const logradourosCache = {};
+
+    // Função para filtrar ruas pelo ano, com cache
     function filtrarRuasPorAno(geojson, ano) {
-      return {
+      if (logradourosCache[ano]) {
+        return logradourosCache[ano];
+      }
+      const resultado = {
         type: 'FeatureCollection',
         features: geojson.features.filter(f => {
           const abertura = f.properties.data_abert ? parseInt(f.properties.data_abert.substring(0,4)) : 0;
@@ -329,6 +335,8 @@
           return abertura <= ano && (!fechamento || fechamento >= ano);
         })
       };
+      logradourosCache[ano] = resultado;
+      return resultado;
     }
 
     // Inicialização
