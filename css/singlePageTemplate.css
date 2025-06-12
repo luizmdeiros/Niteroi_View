@@ -22,8 +22,8 @@ body {
 header {
 	width: 100%;
 	height: 50px; /* altura fixa para header */
-	background-color: #0072C5;
-	border-bottom: 1px solid #0072C5;
+	background-color: #732a0f;
+	border-bottom: 1px solid #732a0f;
 	margin: 0;
 	padding: 0;
 	position: fixed;
@@ -79,7 +79,7 @@ ul li a {
 	text-decoration: none;
 }
 ul li:hover a {
-	color: #2C9AB7;
+	color: #732a0f;
 }
 .hero_header {
 	color: #FFFFFF;
