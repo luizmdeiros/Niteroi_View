@@ -273,7 +273,6 @@
       </div>
     </div>
   </div>
-  <div id="popup" class="ol-popup" style="display:none;"></div>
   <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
   <script src="data/Agua_Niteroi_0.js"></script>
   <script src="data/Terreno_Niteroi_1.js"></script>
@@ -289,6 +288,7 @@
   <script src="styles/CurvasdeNvel_5_style.js"></script>
   <script src="styles/Logradouros_6_style.js"></script>
   <script src="styles/EdifciosHistricos_7_style.js"></script>
+  <script src="js/popups.js"></script>
   <script>
     // Função para gerar ticks de anos responsivos
     function renderTimelineTicks() {
@@ -493,33 +493,8 @@
       renderTimelineTicks();
     });
 
-    // Popups
-    const popup = document.getElementById('popup');
-    map.on('singleclick', function(evt) {
-      const feature = map.forEachFeatureAtPixel(evt.pixel, f => f);
-      if (feature) {
-        const props = feature.getProperties();
-        let html = '';
-        if (props.nome_compl || props.nome_pop) {
-          html += `<b>${props.nome_compl || ''}</b>`;
-          if (props.nome_pop && props.nome_pop !== '-') html += `<br><i>(${props.nome_pop})</i>`;
-          if (props.no_ant && props.no_ant !== '-') html += `<br><small>Nome anterior: ${props.no_ant}</small>`;
-          if (props.bairro_esq) html += `<br>Bairro: ${props.bairro_esq}`;
-          if (props.data_abert) html += `<br>Abertura: ${props.data_abert}`;
-          if (props.legislacao && props.legislacao !== '-') html += `<br>Legislação: ${props.legislacao}`;
-        } else if (props.Nome || props.nome) {
-          html += `<b>${props.Nome || props.nome}</b>`;
-        } else {
-          html += '<b>Camada</b>';
-        }
-        popup.innerHTML = html;
-        popup.style.display = 'block';
-        popup.style.left = (evt.pixel[0] + 10) + 'px';
-        popup.style.top = (evt.pixel[1] - 30) + 'px';
-      } else {
-        popup.style.display = 'none';
-      }
-    });
+    // Inicializa o sistema de popups
+    const popupManager = new PopupManager(map);
   
   </script>
 </body>
