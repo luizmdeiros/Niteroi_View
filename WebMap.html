@@ -449,7 +449,11 @@
         center: ol.proj.fromLonLat([-43.103, -22.903]),
         zoom: 13,
         minZoom: 11,
-        maxZoom: 18
+        maxZoom: 18,
+        // Restrição de área para Niterói e arredores
+        // Coordenadas em EPSG:3857: SW(-4834603,-2648452) NE(-4756783,-2582192)
+        extent: [-4834603, -2648452, -4756783, -2582192],
+        constrainOnlyCenter: false
       })
     });
 
