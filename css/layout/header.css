@@ -1,0 +1,71 @@
+/* Header Layout */
+
+header {
+  width: 100%;
+  height: var(--header-height);
+  background-color: var(--primary-color);
+  border-bottom: 1px solid var(--primary-color);
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-index-header);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo {
+  color: var(--text-white);
+  font-weight: var(--font-weight-bold);
+  text-align: left;
+  margin-left: 40px;
+  letter-spacing: var(--letter-spacing-lg);
+  margin: 0;
+  padding: 0;
+}
+
+/* Navigation */
+nav {
+  text-align: right;
+  margin-right: 25px;
+  display: flex;
+  align-items: center;
+}
+
+header nav ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  color: var(--text-white);
+  font-size: var(--font-size-base);
+  margin-right: 25px;
+  letter-spacing: var(--letter-spacing-md);
+  font-weight: var(--font-weight-bold);
+  transition: all 0.3s linear;
+}
+
+/* Hero header for footer */
+.hero_header {
+  color: var(--text-white);
+  text-align: center;
+  margin: 0;
+  letter-spacing: var(--letter-spacing-lg);
+}
+
+ul li a {
+  color: var(--text-white);
+  text-decoration: none;
+}
+
+ul li:hover a {
+  color: var(--primary-color);
+}

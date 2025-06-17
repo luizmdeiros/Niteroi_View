@@ -1,0 +1,110 @@
+/* Typography Styles */
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+}
+
+h1 {
+  font-size: var(--font-size-xl);
+  letter-spacing: var(--letter-spacing-lg);
+}
+
+h2 {
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-md);
+}
+
+h3 {
+  font-size: var(--font-size-md);
+  letter-spacing: var(--letter-spacing-md);
+}
+
+h4 {
+  font-size: var(--font-size-base);
+  letter-spacing: var(--letter-spacing-md);
+}
+
+/* Paragraphs */
+p {
+  margin-bottom: var(--spacing-md);
+  line-height: 1.6;
+}
+
+/* Text utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+/* Font weights */
+.font-light {
+  font-weight: var(--font-weight-light);
+}
+
+.font-normal {
+  font-weight: var(--font-weight-normal);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Font sizes */
+.text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.text-base {
+  font-size: var(--font-size-base);
+}
+
+.text-md {
+  font-size: var(--font-size-md);
+}
+
+.text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.text-xl {
+  font-size: var(--font-size-xl);
+}
+
+/* Text colors */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+.text-light {
+  color: var(--text-light);
+}
+
+.text-white {
+  color: var(--text-white);
+}

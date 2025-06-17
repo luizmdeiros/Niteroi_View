@@ -1,0 +1,44 @@
+/* Container Layout */
+
+.container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--background-primary);
+  padding-top: var(--header-height);
+  box-sizing: border-box;
+}
+
+/* Map container */
+#map {
+  display: block;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+  position: relative;
+  z-index: var(--z-index-base);
+  box-sizing: border-box;
+  background: #e5e5e5;
+}
+
+/* Footer sections */
+.footer_banner {
+  background-color: var(--background-footer);
+  padding-top: var(--spacing-xxl);
+  padding-bottom: var(--spacing-xxl);
+  margin-bottom: 0;
+  background-image: url(../images/pattern.png);
+  background-repeat: repeat;
+}
+
+.copyright {
+  text-align: center;
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  background-color: var(--background-copyright);
+  color: var(--text-white);
+  text-transform: uppercase;
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--letter-spacing-md);
+  border-top-width: 2px;
+}

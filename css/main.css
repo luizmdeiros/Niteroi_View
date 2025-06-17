@@ -1,0 +1,21 @@
+/* Main CSS File - Modular Architecture */
+
+/* Base Styles */
+@import url('base/variables.css');
+@import url('base/reset.css');
+@import url('base/typography.css');
+
+/* Layout */
+@import url('layout/container.css');
+@import url('layout/header.css');
+
+/* Components */
+@import url('components/navigation.css');
+@import url('components/timeline.css');
+
+/* Pages */
+@import url('pages/index.css');
+@import url('pages/webmap.css');
+
+/* Utilities */
+@import url('utils/responsive.css');

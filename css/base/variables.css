@@ -1,0 +1,88 @@
+/* CSS Variables - Design System */
+
+:root {
+  /* Colors */
+  --primary-color: #732a0f;
+  --primary-light: #a3441a;
+  --primary-dark: #4a1b0a;
+  
+  --secondary-color: #0072C5;
+  --secondary-light: #3d85c6;
+  --secondary-dark: #005a9e;
+  
+  --background-primary: #FFFFFF;
+  --background-secondary: #f2f2f2;
+  --background-tertiary: #f8f9fa;
+  --background-footer: #B3B3B3;
+  --background-copyright: #717070;
+  
+  --text-primary: #000000;
+  --text-secondary: #444;
+  --text-tertiary: #717070;
+  --text-light: #A3A3A3;
+  --text-white: #FFFFFF;
+  
+  --border-color: #ccc;
+  --border-light: rgba(255,255,255,0.1);
+  
+  /* Layout */
+  --header-height: 50px;
+  --container-max-width: 1200px;
+  --container-padding: 20px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  
+  /* Typography */
+  --font-family-primary: source-sans-pro, Arial, sans-serif;
+  --font-family-secondary: Arial, sans-serif;
+  
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  
+  --font-weight-light: 200;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  
+  --letter-spacing-sm: 1px;
+  --letter-spacing-md: 2px;
+  --letter-spacing-lg: 4px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 2px 5px rgba(0,0,0,0.2);
+  --shadow-lg: 0 2px 12px rgba(0,0,0,0.05);
+  --shadow-xl: 0 2px 16px rgba(0,0,0,0.18);
+  
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 14px;
+  --border-radius-full: 50%;
+  
+  /* Z-index */
+  --z-index-base: 1;
+  --z-index-header: 1000;
+  --z-index-dropdown: 1001;
+  --z-index-timeline: 1200;
+  
+  /* Breakpoints */
+  --breakpoint-mobile: 320px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-large: 1200px;
+  
+  /* Timeline */
+  --timeline-background: rgba(255,255,255,0.95);
+  --timeline-gradient: linear-gradient(to right, #cfe2f3, #9fc5e8, #6fa8dc);
+}

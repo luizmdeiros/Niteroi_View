@@ -1,0 +1,147 @@
+/* Navigation Component */
+
+/* Hamburger menu is hidden by default */
+.hamburger {
+  display: none;
+}
+
+/* Mobile Navigation Styles */
+@media (max-width: 320px) {
+  .container header nav {
+    margin: 0;
+    width: 100%;
+    float: none;
+    display: none;
+  }
+  
+  header nav ul {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+  
+  nav ul li {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .hero_header {
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
+    line-height: 22px;
+    text-align: center;
+  }
+}
+
+/* Hamburger Menu for tablets */
+@media (min-width: 321px) and (max-width: 767px) {
+  /* Hide regular navigation menu items */
+  header nav ul {
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background-color: var(--primary-color);
+    z-index: var(--z-index-header);
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* Show menu when hamburger is clicked */
+  header nav ul.show {
+    display: flex;
+  }
+  
+  /* Override the inline-block display from the wider media query */
+  nav ul li {
+    float: none;
+    display: block;
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  
+  /* Show hamburger menu */
+  .hamburger {
+    display: block;
+    position: absolute;
+    top: 14px;
+    right: 15px;
+    width: 30px;
+    height: 22px;
+    cursor: pointer;
+    z-index: var(--z-index-dropdown);
+  }
+  
+  .hamburger span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: var(--text-white);
+    border-radius: 3px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+  }
+  
+  .hamburger span:nth-child(1) {
+    top: 0px;
+  }
+  
+  .hamburger span:nth-child(2) {
+    top: 9px;
+  }
+  
+  .hamburger span:nth-child(3) {
+    top: 18px;
+  }
+  
+  /* Hamburger animation */
+  .hamburger.open span:nth-child(1) {
+    top: 9px;
+    transform: rotate(135deg);
+  }
+  
+  .hamburger.open span:nth-child(2) {
+    opacity: 0;
+    left: -60px;
+  }
+  
+  .hamburger.open span:nth-child(3) {
+    top: 9px;
+    transform: rotate(-135deg);
+  }
+  
+  .logo {
+    width: 100%;
+    text-align: center;
+    color: var(--text-white);
+    margin-left: 0px;
+  }
+  
+  .container header nav {
+    margin: 0;
+    width: 100%;
+    float: none;
+    overflow: auto;
+    display: inline-block;
+    background: var(--primary-color);
+  }
+  
+  nav {
+    width: 100%;
+    float: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+}

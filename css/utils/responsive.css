@@ -1,0 +1,71 @@
+/* Responsive Utilities */
+
+/* Display utilities */
+.show-mobile {
+  display: none;
+}
+
+.show-tablet {
+  display: none;
+}
+
+.show-desktop {
+  display: block;
+}
+
+/* Mobile First Responsive Breakpoints */
+@media (max-width: 320px) {
+  .hide-mobile {
+    display: none;
+  }
+  
+  .show-mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 321px) and (max-width: 767px) {
+  .hide-tablet {
+    display: none;
+  }
+  
+  .show-tablet {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none;
+  }
+  
+  .show-desktop {
+    display: block;
+  }
+}
+
+/* Spacing utilities for different screen sizes */
+@media (max-width: 767px) {
+  .mobile-padding {
+    padding: var(--spacing-sm);
+  }
+  
+  .mobile-margin {
+    margin: var(--spacing-sm);
+  }
+}
+
+/* Container responsive behavior */
+@media (max-width: 1200px) {
+  .container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
+  }
+}
