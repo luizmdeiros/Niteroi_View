@@ -1,5 +1,13 @@
 /* CSS Reset and Base Styles */
 
+/* HTML and body reset */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 /* Box sizing reset */
 *,
 *::before,

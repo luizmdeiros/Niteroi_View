@@ -10,7 +10,7 @@
   z-index: var(--z-index-timeline);
   background: var(--timeline-background);
   border-radius: var(--border-radius-xl);
-  padding: var(--spacing-md) 2vw var(--spacing-lg) 2vw;
+  padding: 25px 2vw 30px 2vw;
   box-shadow: var(--shadow-xl);
   font-family: var(--font-family-secondary);
   min-width: 260px;
@@ -114,7 +114,7 @@
 #timeline-slider-row input[type=range] {
   flex: 1 1 auto;
   width: 100%;
-  margin: 0;
+  margin: 15px 0 0 0;
 }
 
 /* Timeline Slider Styles */

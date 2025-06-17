@@ -1,5 +1,59 @@
 /* WebMap Page Specific Styles */
 
+/* Garantir que o container ocupe toda a largura */
+.container {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  padding-top: 0;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Garantir que o mapa ocupe 100% da largura */
+#map {
+  position: absolute;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: calc(100vh - var(--header-height));
+  margin: 0;
+  padding: 0;
+}
+
+/* Media query para dispositivos pequenos */
+@media (max-width: 767px) {
+  .container {
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  #map {
+    position: absolute;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: calc(100vh - var(--header-height));
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Timeline container ajustes */
+#timeline-container {
+  width: 100%;
+  margin: 0;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
 /* Popup styles specific to the map */
 .ol-popup {
   position: absolute;
