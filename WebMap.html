@@ -188,6 +188,17 @@
       }
     });
 
+    // Camada de relevo sombreado (imagem)
+    const relevoLayer = new ol.layer.Image({
+      source: new ol.source.ImageStatic({
+        url: 'data/MDE_Niteroi_3.png',
+        imageExtent: [-4865295.650272, -2641981.864120, -4745410.743154, -2572516.549375],
+        projection: 'EPSG:3857',
+      }),
+      opacity: 1,
+      title: 'Relevo Sombreado'
+    });
+
     // Lagunas
     const lagunasSource = new ol.source.Vector({
       features: new ol.format.GeoJSON().readFeatures(json_Lagunas_2, {featureProjection: 'EPSG:3857'})
@@ -211,18 +222,7 @@
       updateWhileAnimating: false,
       updateWhileInteracting: false
     });
-
-    // Curvas de Nível
-    const curvasSource = new ol.source.Vector({
-      features: new ol.format.GeoJSON().readFeatures(json_CurvasdeNvel_5, {featureProjection: 'EPSG:3857'})
-    });
-    const curvasLayer = new ol.layer.Vector({
-      source: curvasSource,
-      style: style_CurvasdeNvel_5,
-      title: 'Curvas de Nível',
-      renderer: 'webgl'
-    });
-
+    
     // Edifícios Históricos (com timeline)
     let edifSource = new ol.source.Vector({});
     const edifLayer = new ol.layer.Vector({
@@ -258,15 +258,15 @@
       });
     }
 
-    // Mapa - COM OTIMIZAÇÕES WebGL
+    // Mapa
     const map = new ol.Map({
       target: 'map',
       layers: [
         aguaLayer,
         terrenoLayer,
+        relevoLayer,
         lagunasLayer,
         areaUrbanaLayer,
-        curvasLayer,
         logradourosLayer,
         edifLayer
       ],
@@ -278,46 +278,8 @@
         // Restrição de área para Niterói e arredores
         // Coordenadas em EPSG:3857: SW(-4834603,-2648452) NE(-4756783,-2582192)
         extent: [-4834603, -2648452, -4756783, -2582192],
-        constrainOnlyCenter: false,
-        // Otimizações de renderização
-        enableRotation: false, // Desabilitar rotação para melhor performance
-        constrainResolution: true, // Forçar resoluções específicas
-        smoothResolutionConstraint: false // Desabilitar suavização para melhor performance
-      }),
-      // Otimizações gerais do mapa
-      loadTilesWhileAnimating: false,
-      loadTilesWhileInteracting: false,
-      // Configurações WebGL otimizadas
-      renderer: 'webgl',
-      pixelRatio: Math.min(window.devicePixelRatio, 2), // Limitar pixel ratio para melhor performance
-      // OTIMIZAÇÃO: Canvas2D para múltiplas operações de leitura (elimina avisos do console)
-      controls: ol.control.defaults({
-        attributionOptions: {
-          collapsible: false
-        }
-      }),
-      // Configuração para otimizar operações Canvas2D
-      keyboardEventTarget: document
-    });
-
-    // OTIMIZAÇÃO: Configurar willReadFrequently nos canvas do mapa
-    map.once('postrender', function() {
-      const mapCanvas = map.getTargetElement().querySelector('canvas');
-      if (mapCanvas && mapCanvas.getContext) {
-        // Reconfigurar contexto 2D com willReadFrequently
-        const ctx = mapCanvas.getContext('2d', { willReadFrequently: true });
-        if (ctx) {
-          console.log('Canvas2D configurado com willReadFrequently: true');
-        }
-      }
-      
-      // Configurar também para canvas de overlay (popups)
-      const overlayCanvases = map.getTargetElement().querySelectorAll('canvas');
-      overlayCanvases.forEach(canvas => {
-        if (canvas.getContext) {
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        }
-      });
+        constrainOnlyCenter: false
+      })
     });
 
     // Atualiza todas as camadas temporais conforme o ano
@@ -356,8 +318,8 @@
       renderTimelineTicks();
     });
 
-    // Inicializa o sistema de popups
-    const popupManager = new PopupManager(map);
+    // Inicializa o sistema de popups (apenas para Logradouros e Edifícios Históricos)
+    const popupManager = new PopupManager(map, logradourosLayer, edifLayer);
   
   </script>
 </body>

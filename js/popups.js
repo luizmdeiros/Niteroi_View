@@ -3,8 +3,10 @@
  * Responsável por criar, exibir e gerenciar popups informativos das features do mapa
  */
 class PopupManager {
-  constructor(map) {
+  constructor(map, logradourosLayer, edifLayer) {
     this.map = map;
+    this.logradourosLayer = logradourosLayer;
+    this.edifLayer = edifLayer;
     this.popup = null;
     this.init();
   }
@@ -81,11 +83,19 @@ class PopupManager {
    * Manipula cliques no mapa
    */
   handleMapClick(evt) {
-    const feature = this.map.forEachFeatureAtPixel(evt.pixel, f => f);
-    
+    // Só considera features dos layers desejados
+    const feature = this.map.forEachFeatureAtPixel(
+      evt.pixel,
+      function(f, l) {
+        return f;
+      },
+      {
+        layerFilter: (layer) => layer === this.logradourosLayer || layer === this.edifLayer
+      }
+    );
+
     if (feature) {
       const props = feature.getProperties();
-      
       // Só mostra popup para logradouros e edifícios históricos
       if (this.isLogradouro(props) || this.isEdificio(props)) {
         const content = this.generatePopupContent(feature);
@@ -355,3 +365,4 @@ class PopupManager {
 
 // Exporta a classe para uso global
 window.PopupManager = PopupManager;
+
