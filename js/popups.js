@@ -35,12 +35,18 @@ class PopupManager {
         border: 1px solid #ccc;
         bottom: 12px;
         left: -50px;
-        min-width: 180px;
+        min-width: 150px;
+        max-width: 300px;
+        width: auto;
+        height: auto;
+        max-height: 200px;
+        overflow-y: auto;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         font-family: Arial, sans-serif;
         font-size: 14px;
         z-index: 100;
         display: none;
+        word-wrap: break-word;
       `;
       document.body.appendChild(this.popup);
     } else {
@@ -340,22 +346,6 @@ class PopupManager {
         
         .popup-info:last-child {
           margin-bottom: 0;
-        }
-        
-        .popup-logradouro {
-          max-width: 250px;
-        }
-        
-        .popup-edificio {
-          max-width: 220px;
-        }
-        
-        .popup-area {
-          max-width: 200px;
-        }
-        
-        .popup-generic {
-          max-width: 180px;
         }
       `;
       document.head.appendChild(style);
