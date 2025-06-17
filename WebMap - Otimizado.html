@@ -168,7 +168,7 @@
       updateWhileInteracting: false
     });
 
-    // Terreno (com timeline)
+    // Terreno (com timeline) - Otimizado com simplificação geométrica
     let terrenoSource = new ol.source.Vector({});
     const terrenoLayer = new ol.layer.Vector({
       source: terrenoSource,
@@ -201,7 +201,7 @@
       updateWhileInteracting: false
     });
 
-    // Área Urbana (com timeline)
+    // Área Urbana (com timeline) - Otimizada
     let areaUrbanaSource = new ol.source.Vector({});
     const areaUrbanaLayer = new ol.layer.Vector({
       source: areaUrbanaSource,
@@ -212,53 +212,112 @@
       updateWhileInteracting: false
     });
 
-    // Curvas de Nível
+    // Curvas de Nível - OTIMIZAÇÃO CRÍTICA para arquivo de 4.4MB
     const curvasSource = new ol.source.Vector({
       features: new ol.format.GeoJSON().readFeatures(json_CurvasdeNvel_5, {featureProjection: 'EPSG:3857'})
     });
     const curvasLayer = new ol.layer.Vector({
       source: curvasSource,
-      style: style_CurvasdeNvel_5,
+      style: function(feature, resolution) {
+        // Renderizar curvas apenas em zoom alto (> 14)
+        if (map && map.getView().getZoom() < 14) {
+          return null; // Não renderizar
+        }
+        // Simplificar geometria baseada na resolução
+        const geom = feature.getGeometry();
+        if (resolution > 5) {
+          const simplified = geom.simplify(resolution);
+          feature.setGeometry(simplified);
+        }
+        return style_CurvasdeNvel_5(feature, resolution);
+      },
       title: 'Curvas de Nível',
-      renderer: 'webgl'
+      renderMode: 'image',
+      updateWhileAnimating: false,
+      updateWhileInteracting: false,
+      // Renderização condicional baseada no zoom
+      minZoom: 14,
+      maxZoom: 18
     });
 
-    // Edifícios Históricos (com timeline)
+    // Edifícios Históricos (com timeline) - COM CLUSTERING
     let edifSource = new ol.source.Vector({});
-    const edifLayer = new ol.layer.Vector({
+    
+    // Clustering para edifícios históricos
+    const edifClusterSource = new ol.source.Cluster({
+      distance: 40, // Distância para clustering
+      minDistance: 20, // Distância mínima
       source: edifSource,
-      style: style_EdifciosHistricos_7,
-      title: 'Edifícios Históricos',
-      renderer: 'webgl'
+      geometryFunction: function(feature) {
+        // Clustering apenas em zoom baixo
+        const zoom = map ? map.getView().getZoom() : 13;
+        return zoom < 15 ? feature.getGeometry() : null;
+      }
     });
 
-    // Logradouros (com timeline)
+    const edifLayer = new ol.layer.Vector({
+      source: edifClusterSource,
+      style: function(feature, resolution) {
+        const features = feature.get('features');
+        if (features && features.length > 1) {
+          // Estilo para clusters
+          return new ol.style.Style({
+            image: new ol.style.Circle({
+              radius: Math.min(features.length * 2 + 10, 25),
+              fill: new ol.style.Fill({color: 'rgba(255, 153, 0, 0.8)'}),
+              stroke: new ol.style.Stroke({color: 'rgba(255, 153, 0, 1)', width: 2})
+            }),
+            text: new ol.style.Text({
+              text: features.length.toString(),
+              fill: new ol.style.Fill({color: '#fff'}),
+              font: 'bold 12px Arial'
+            })
+          });
+        } else {
+          // Estilo individual
+          return style_EdifciosHistricos_7(features ? features[0] : feature, resolution);
+        }
+      },
+      title: 'Edifícios Históricos',
+      renderMode: 'vector', // Manter vector para interatividade
+      updateWhileAnimating: false,
+      updateWhileInteracting: true
+    });
+
+    // Logradouros (com timeline) - OTIMIZAÇÃO CRÍTICA para arquivo de 2.5MB
     let logradourosSource = new ol.source.Vector({});
     let logradourosLayer = new ol.layer.Vector({
       source: logradourosSource,
-      style: style_Logradouros_6,
+      style: function(feature, resolution) {
+        // Renderização baseada no zoom
+        const zoom = map ? map.getView().getZoom() : 13;
+        
+        // Não renderizar ruas secundárias em zoom baixo
+        if (zoom < 14) {
+          const tipo = feature.get('Tipo') || feature.get('tipo') || '';
+          if (!tipo.includes('Principal') && !tipo.includes('Avenida')) {
+            return null;
+          }
+        }
+        
+        // Simplificar geometria em zoom baixo
+        if (resolution > 5) {
+          const geom = feature.getGeometry();
+          const simplified = geom.simplify(resolution * 0.5);
+          feature.setGeometry(simplified);
+        }
+        
+        return style_Logradouros_6(feature, resolution);
+      },
       title: 'Logradouros (ruas)',
-      renderer: 'webgl'
+      renderMode: 'image',
+      updateWhileAnimating: false,
+      updateWhileInteracting: false,
+      // Renderização progressiva
+      minZoom: 12
     });
 
-    let timelineUpdateTimeout;
-    function atualizarCamadasTemporaisDebounced(ano) {
-      clearTimeout(timelineUpdateTimeout);
-      timelineUpdateTimeout = setTimeout(() => {
-        atualizarCamadasTemporais(ano);
-      }, 30); // 30ms de debounce
-    }
-
-    // Função para filtrar qualquer camada GeoJSON pelo ano
-    function filtrarFeaturesPorAno(geojson, ano) {
-      return geojson.features.filter(f => {
-        const abertura = f.properties.data_abert ? parseInt(f.properties.data_abert.substring(0,4)) : 0;
-        const fechamento = f.properties.data_fecha ? parseInt(f.properties.data_fecha.substring(0,4)) : null;
-        return abertura <= ano && (!fechamento || fechamento >= ano);
-      });
-    }
-
-    // Mapa
+    // Mapa - COM OTIMIZAÇÕES WebGL
     const map = new ol.Map({
       target: 'map',
       layers: [
@@ -278,9 +337,55 @@
         // Restrição de área para Niterói e arredores
         // Coordenadas em EPSG:3857: SW(-4834603,-2648452) NE(-4756783,-2582192)
         extent: [-4834603, -2648452, -4756783, -2582192],
-        constrainOnlyCenter: false
-      })
+        constrainOnlyCenter: false,
+        // Otimizações de renderização
+        enableRotation: false, // Desabilitar rotação para melhor performance
+        constrainResolution: true, // Forçar resoluções específicas
+        smoothResolutionConstraint: false // Desabilitar suavização para melhor performance
+      }),
+      // Otimizações gerais do mapa
+      loadTilesWhileAnimating: false,
+      loadTilesWhileInteracting: false,
+      // Configurações WebGL otimizadas
+      renderer: 'webgl',
+      pixelRatio: Math.min(window.devicePixelRatio, 2) // Limitar pixel ratio para melhor performance
     });
+
+    // OTIMIZAÇÃO: Listener para otimizar renderização baseada no zoom
+    map.getView().on('change:resolution', function() {
+      const zoom = map.getView().getZoom();
+      
+      // Controlar visibilidade das camadas baseado no zoom
+      curvasLayer.setVisible(zoom >= 14);
+      
+      // Ajustar clustering dos edifícios
+      if (zoom >= 15) {
+        edifLayer.setSource(edifSource); // Sem clustering em zoom alto
+      } else {
+        edifLayer.setSource(edifClusterSource); // Com clustering em zoom baixo
+      }
+      
+      // Forçar re-renderização otimizada
+      map.render();
+    });
+
+    // OTIMIZAÇÃO: Debounce para atualizações do timeline
+    let timelineUpdateTimeout;
+    function atualizarCamadasTemporaisDebounced(ano) {
+      clearTimeout(timelineUpdateTimeout);
+      timelineUpdateTimeout = setTimeout(() => {
+        atualizarCamadasTemporais(ano);
+      }, 30); // 150ms de debounce
+    }
+
+    // Função para filtrar qualquer camada GeoJSON pelo ano
+    function filtrarFeaturesPorAno(geojson, ano) {
+      return geojson.features.filter(f => {
+        const abertura = f.properties.data_abert ? parseInt(f.properties.data_abert.substring(0,4)) : 0;
+        const fechamento = f.properties.data_fecha ? parseInt(f.properties.data_fecha.substring(0,4)) : null;
+        return abertura <= ano && (!fechamento || fechamento >= ano);
+      });
+    }
 
     // Atualiza todas as camadas temporais conforme o ano
     function atualizarCamadasTemporais(ano) {
@@ -308,7 +413,7 @@
     }
     atualizarCamadasTemporais(anoAtual);
 
-    // Controle timeline
+    // Controle timeline - COM DEBOUNCE
     const timeline = document.getElementById('timeline');
     const yearValue = document.getElementById('year-value');
     timeline.addEventListener('input', function() {
