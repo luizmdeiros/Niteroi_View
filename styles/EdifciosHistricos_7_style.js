@@ -20,8 +20,12 @@ var style_EdifciosHistricos_7 = function(feature, resolution){
     if ("" !== null) {
         labelText = String("");
     }
+    // Lógica para cor verde quando Tipo ou tipo for 'Praça'
+    var tipo = feature.get('Tipo') || feature.get('tipo');
+    var fillColor = (tipo === 'Praça') ? 'rgba(72,181,118,1.0)' : 'rgba(150,150,150,1.0)';
     var style = [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(247,247,247,1.0)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),fill: new ol.style.Fill({color: 'rgba(150,150,150,1.0)'}),
+        stroke: new ol.style.Stroke({color: 'rgba(247,247,247,1.0)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.988}),
+        fill: new ol.style.Fill({color: fillColor}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
