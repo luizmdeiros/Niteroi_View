@@ -56,11 +56,17 @@ class PopupManager {
       this.handleMapClick(evt);
     });
 
-    // Esconde popup ao clicar fora
+    // Esconde popup ao mover mouse fora de features relevantes
     this.map.on('pointermove', (evt) => {
       const feature = this.map.forEachFeatureAtPixel(evt.pixel, f => f);
       if (!feature) {
         this.hidePopup();
+      } else {
+        const props = feature.getProperties();
+        // Esconde se não for logradouro nem edifício
+        if (!this.isLogradouro(props) && !this.isEdificio(props)) {
+          this.hidePopup();
+        }
       }
     });
   }
@@ -72,8 +78,15 @@ class PopupManager {
     const feature = this.map.forEachFeatureAtPixel(evt.pixel, f => f);
     
     if (feature) {
-      const content = this.generatePopupContent(feature);
-      this.showPopup(evt.pixel, content);
+      const props = feature.getProperties();
+      
+      // Só mostra popup para logradouros e edifícios históricos
+      if (this.isLogradouro(props) || this.isEdificio(props)) {
+        const content = this.generatePopupContent(feature);
+        this.showPopup(evt.pixel, content);
+      } else {
+        this.hidePopup();
+      }
     } else {
       this.hidePopup();
     }
@@ -108,7 +121,14 @@ class PopupManager {
    * Verifica se é um edifício
    */
   isEdificio(props) {
-    return props.Nome && (props.tipo || props.categoria);
+    // Verifica se tem propriedades típicas de edifícios históricos
+    // Aceita se tem Tipo definido (mesmo com Nome null) ou se tem Nome com tipo/categoria
+    return (props.Tipo && props.Tipo !== null) || 
+           (props.tipo && props.tipo !== null) || 
+           (props.categoria && props.categoria !== null) ||
+           (props.Nome && (props.tipo || props.categoria)) ||
+           // Também aceita se tem Bairro e data_abert (indicativo de edifício histórico)
+           (props.Bairro && props.data_abert && props.data_abert !== null);
   }
 
   /**
@@ -165,17 +185,42 @@ class PopupManager {
   createEdificioTemplate(props) {
     let html = '<div class="popup-edificio">';
     
-    if (props.Nome) {
+    // Nome do edifício (se disponível)
+    if (props.Nome && props.Nome !== null) {
       html += `<div class="popup-title">${props.Nome}</div>`;
+    } else if (props.Tipo && props.Tipo !== null) {
+      // Se não tem nome, usa o tipo como título
+      html += `<div class="popup-title">${props.Tipo}</div>`;
+    } else {
+      html += '<div class="popup-title">Edifício Histórico</div>';
     }
     
-    if (props.tipo) {
+    // Tipo do edifício (Tipo ou tipo)
+    if (props.Tipo && props.Tipo !== null && props.Nome) {
+      html += `<div class="popup-info">🏢 Tipo: ${props.Tipo}</div>`;
+    } else if (props.tipo && props.tipo !== null) {
       html += `<div class="popup-info">🏢 Tipo: ${props.tipo}</div>`;
     }
     
-    if (props.data_abert) {
+    // Bairro
+    if (props.Bairro && props.Bairro !== null) {
+      html += `<div class="popup-info">📍 Bairro: ${props.Bairro}</div>`;
+    }
+    
+    // Endereço
+    if (props.Endereço && props.Endereço !== null) {
+      html += `<div class="popup-info">🏠 Endereço: ${props.Endereço}</div>`;
+    }
+    
+    // Data de abertura/construção
+    if (props.data_abert && props.data_abert !== null) {
       const dataFormatada = this.formatarData(props.data_abert);
       html += `<div class="popup-info">📅 Construção: ${dataFormatada}</div>`;
+    }
+    
+    // Fonte da informação
+    if (props.Fonte && props.Fonte !== null) {
+      html += `<div class="popup-info">📚 Fonte: ${props.Fonte}</div>`;
     }
     
     html += '</div>';
