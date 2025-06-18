@@ -1,0 +1,264 @@
+/* 
+ * Iconografia Page Styles
+ * Parte da arquitetura modular CSS do projeto Niterói View
+ */
+
+/* Apresentação da Iconografia */
+.apresentacao {
+  background: var(--bg-light);
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  border-radius: 12px;
+  margin: 2.5rem 0 1.5rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.apresentacao h2 {
+  color: var(--color-primary);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.apresentacao p {
+  max-width: 800px;
+  margin: 0 auto 1.2rem auto;
+  font-size: 1.12rem;
+  color: var(--color-text);
+  text-align: justify;
+}
+
+.apresentacao blockquote {
+  font-style: italic;
+  color: var(--color-text-muted);
+  border-left: 4px solid var(--color-primary);
+  margin: 1.2rem auto;
+  padding-left: 1rem;
+  max-width: 700px;
+}
+
+.apresentacao blockquote span {
+  display: block;
+  font-size: 0.98rem;
+  color: var(--color-text-light);
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
+/* Filtros de Iconografia */
+.filtros-iconografia {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  max-width: 850px;
+  margin: 0 auto 2rem auto;
+  text-align: center;
+}
+
+.filtros-iconografia h3 {
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.filtro-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.filtro-btn {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtro-btn:hover {
+  background: var(--color-bg-hover);
+}
+
+.filtro-btn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Galeria de Imagens */
+.galeria-iconografia {
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+}
+
+.galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.item-galeria {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.item-galeria:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.imagem-container {
+  position: relative;
+  overflow: hidden;
+  height: 220px;
+}
+
+.imagem-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.imagem-container:hover img {
+  transform: scale(1.05);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.imagem-container:hover .overlay {
+  opacity: 1;
+}
+
+.zoom-icon {
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.legenda {
+  padding: 1.2rem;
+}
+
+.legenda h4 {
+  color: var(--color-primary);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.legenda p {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
+.fonte {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Modal para visualização ampliada */
+.modal-iconografia {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 50px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-conteudo {
+  margin: auto;
+  display: block;
+  max-width: 90%;
+  max-height: 80%;
+  object-fit: contain;
+}
+
+.modal-legenda {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: white;
+  padding: 10px 0;
+  height: 150px;
+}
+
+.fechar-modal {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.fechar-modal:hover,
+.fechar-modal:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Responsividade */
+@media only screen and (max-width: 768px) {
+  .galeria-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .imagem-container {
+    height: 180px;
+  }
+  
+  .modal-conteudo {
+    max-width: 95%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .filtro-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .filtro-btn {
+    width: 80%;
+  }
+  
+  .galeria-grid {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+  }
+}
