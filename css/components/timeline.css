@@ -126,6 +126,12 @@
   z-index: 2;
 }
 
+/* Remove o outline vermelho do controle deslizante quando em foco */
+input[type=range]:focus {
+  outline: none;
+  outline-offset: 0;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 600px) {
   #timeline-container {
