@@ -78,14 +78,12 @@
   <script src="data/Terreno_Niteroi_1.js"></script>
   <script src="data/Lagunas_2.js"></script>
   <script src="data/Area_Urbana_4.js"></script>
-  <script src="data/CurvasdeNvel_5.js"></script>
   <script src="data/Logradouros_6.js"></script>
   <script src="data/EdifciosHistricos_7.js"></script>
   <script src="styles/Agua_Niteroi_0_style.js"></script>
   <script src="styles/Terreno_Niteroi_1_style.js"></script>
   <script src="styles/Lagunas_2_style.js"></script>
   <script src="styles/Area_Urbana_4_style.js"></script>
-  <script src="styles/CurvasdeNvel_5_style.js"></script>
   <script src="styles/Logradouros_6_style.js"></script>
   <script src="styles/EdifciosHistricos_7_style.js"></script>
   <script src="js/popups.js"></script>
@@ -212,34 +210,6 @@
       updateWhileInteracting: false
     });
 
-    // Curvas de Nível - OTIMIZAÇÃO CRÍTICA para arquivo de 4.4MB
-    const curvasSource = new ol.source.Vector({
-      features: new ol.format.GeoJSON().readFeatures(json_CurvasdeNvel_5, {featureProjection: 'EPSG:3857'})
-    });
-    const curvasLayer = new ol.layer.Vector({
-      source: curvasSource,
-      style: function(feature, resolution) {
-        // Renderizar curvas apenas em zoom alto (> 14)
-        if (map && map.getView().getZoom() < 14) {
-          return null; // Não renderizar
-        }
-        // Simplificar geometria baseada na resolução
-        const geom = feature.getGeometry();
-        if (resolution > 5) {
-          const simplified = geom.simplify(resolution);
-          feature.setGeometry(simplified);
-        }
-        return style_CurvasdeNvel_5(feature, resolution);
-      },
-      title: 'Curvas de Nível',
-      renderMode: 'image',
-      updateWhileAnimating: false,
-      updateWhileInteracting: false,
-      // Renderização condicional baseada no zoom
-      minZoom: 14,
-      maxZoom: 18
-    });
-
     // Edifícios Históricos (com timeline) - COM CLUSTERING
     let edifSource = new ol.source.Vector({});
     
@@ -325,7 +295,6 @@
         terrenoLayer,
         lagunasLayer,
         areaUrbanaLayer,
-        curvasLayer,
         logradourosLayer,
         edifLayer
       ],
@@ -387,10 +356,7 @@
     // OTIMIZAÇÃO: Listener para otimizar renderização baseada no zoom
     map.getView().on('change:resolution', function() {
       const zoom = map.getView().getZoom();
-      
-      // Controlar visibilidade das camadas baseado no zoom
-      curvasLayer.setVisible(zoom >= 14);
-      
+            
       // Ajustar clustering dos edifícios
       if (zoom >= 15) {
         edifLayer.setSource(edifSource); // Sem clustering em zoom alto
