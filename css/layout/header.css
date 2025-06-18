@@ -68,7 +68,7 @@ ul li a {
 }
 
 ul li:hover a {
-  color: var(--primary-color);
+  color: var(--background-footer);
 }
 
 /* Media Queries - Mobile Layout */

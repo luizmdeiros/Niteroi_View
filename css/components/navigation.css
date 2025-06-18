@@ -40,7 +40,7 @@
   header nav ul {
     display: none;
     position: absolute;
-    top: 60px;
+    top: 50x;
     left: 0;
     width: 100%;
     background-color: var(--primary-color);
