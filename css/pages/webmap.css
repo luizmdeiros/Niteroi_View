@@ -21,6 +21,7 @@
   height: calc(100vh - var(--header-height));
   margin: 0;
   padding: 0;
+  touch-action: none; /* Impede que o Chrome mobile priorize gestos do sistema */
 }
 
 /* Media query para dispositivos pequenos */
@@ -43,6 +44,7 @@
     height: calc(100vh - var(--header-height));
     margin: 0;
     padding: 0;
+    touch-action: none; /* Impede que o Chrome mobile priorize gestos do sistema */
   }
 }
 
