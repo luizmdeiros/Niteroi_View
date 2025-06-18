@@ -23,9 +23,9 @@
   width: 100%;
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: flex;
   justify-content: space-between;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xs);
 }
 
 #timeline-slider-col {
@@ -86,7 +86,6 @@
   font-size: var(--font-size-lg);
   color: var(--text-primary);
   font-weight: var(--font-weight-bold);
-  min-width: 56px;
   text-align: right;
   letter-spacing: 0.5px;
   margin: 0;
