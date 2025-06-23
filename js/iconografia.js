@@ -1,66 +1,160 @@
 /**
  * Iconografia.js
  * Script para gerenciar a funcionalidade da página de Iconografia do projeto Niterói View
+ * Versão atualizada para trabalhar com miniaturas e imagens completas
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos do DOM
-    const filtroButtons = document.querySelectorAll('.filtro-btn');
-    const itensGaleria = document.querySelectorAll('.item-galeria');
-    const modal = document.querySelector('.modal-iconografia');
-    const modalImg = document.getElementById('img-ampliada');
-    const modalLegenda = document.querySelector('.modal-legenda');
+    // Selecionar elementos do DOM
+    const filtros = document.querySelectorAll('.filtro-btn');
+    const galeriaContainer = document.querySelector('.galeria-container');
+    const modal = document.getElementById('imagem-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalTitulo = document.getElementById('modal-titulo');
+    const modalLegenda = document.getElementById('modal-legenda');
     const fecharModal = document.querySelector('.fechar-modal');
-    const zoomIcons = document.querySelectorAll('.zoom-icon');
     
-    // Filtrar itens da galeria por período
-    filtroButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remover classe active de todos os botões
-            filtroButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Adicionar classe active ao botão clicado
-            this.classList.add('active');
-            
-            // Obter o período selecionado
-            const periodoSelecionado = this.getAttribute('data-periodo');
-            
-            // Filtrar os itens da galeria
-            itensGaleria.forEach(item => {
-                if (periodoSelecionado === 'todos' || item.getAttribute('data-periodo') === periodoSelecionado) {
-                    item.style.display = 'block';
-                    // Adicionar animação de fade-in
-                    item.style.opacity = 0;
-                    setTimeout(() => {
-                        item.style.opacity = 1;
-                        item.style.transition = 'opacity 0.5s ease';
-                    }, 50);
-                } else {
-                    item.style.display = 'none';
+    // Carregar dados do JSON
+    carregarImagensDoJSON();
+    
+    // Função para carregar imagens do arquivo JSON
+    function carregarImagensDoJSON() {
+        fetch('data/iconografia.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar o arquivo JSON: ' + response.status);
                 }
+                return response.json();
+            })
+            .then(data => {
+                // Limpar a galeria existente
+                galeriaContainer.innerHTML = '';
+                
+                // Adicionar cada imagem à galeria
+                data.imagens.forEach(imagem => {
+                    adicionarImagemNaGaleria(imagem);
+                });
+                
+                // Adicionar eventos de clique às imagens após carregá-las
+                adicionarEventosClique();
+            })
+            .catch(error => {
+                console.error('Erro ao carregar as imagens:', error);
+                galeriaContainer.innerHTML = `
+                    <div class="erro-carregamento">
+                        <p>Não foi possível carregar as imagens. Por favor, tente novamente mais tarde.</p>
+                        <p>Erro: ${error.message}</p>
+                    </div>
+                `;
+            });
+    }
+    
+    // Função para adicionar uma imagem na galeria
+    function adicionarImagemNaGaleria(imagem) {
+        const imagemElement = document.createElement('div');
+        imagemElement.className = 'galeria-item';
+        imagemElement.setAttribute('data-periodo', imagem.periodo);
+        imagemElement.setAttribute('data-id', imagem.id);
+        
+        // Verificar se estamos usando o novo formato com arquivos separados para thumb e full
+        const thumbSrc = imagem.arquivos ? 
+            `images/iconografia/${imagem.arquivos.thumb}` : 
+            `images/iconografia/${imagem.arquivo}`;
+            
+        const fullSrc = imagem.arquivos ? 
+            `images/iconografia/${imagem.arquivos.full}` : 
+            `images/iconografia/${imagem.arquivo}`;
+        
+        // Criar o HTML da imagem com seus metadados
+        const legenda = `
+            <p><strong>Título:</strong> ${imagem.titulo}</p>
+            <p><strong>Ano:</strong> ${imagem.ano}</p>
+            <p><strong>Autor:</strong> ${imagem.autor}</p>
+            <p><strong>Fonte:</strong> ${imagem.fonte}</p>
+            <p>${imagem.descricao}</p>
+        `;
+        
+        imagemElement.innerHTML = `
+            <img src="${thumbSrc}" 
+                 alt="${imagem.titulo}" 
+                 data-full="${fullSrc}"
+                 data-legenda="${legenda}" 
+                 loading="lazy">
+            <div class="galeria-info">
+                <h3>${imagem.titulo}</h3>
+                <p>${imagem.ano}</p>
+            </div>
+        `;
+        
+        galeriaContainer.appendChild(imagemElement);
+    }
+    
+    // Adicionar evento de clique aos botões de filtro
+    filtros.forEach(filtro => {
+        filtro.addEventListener('click', function() {
+            // Remover classe ativa de todos os filtros
+            filtros.forEach(f => f.classList.remove('ativo'));
+            
+            // Adicionar classe ativa ao filtro clicado
+            this.classList.add('ativo');
+            
+            // Obter o valor do filtro
+            const filtroValor = this.getAttribute('data-filtro');
+            
+            // Filtrar as imagens
+            filtrarImagens(filtroValor);
+        });
+    });
+    
+    // Função para filtrar imagens
+    function filtrarImagens(filtro) {
+        const imagens = document.querySelectorAll('.galeria-item');
+        
+        imagens.forEach(imagem => {
+            if (filtro === 'todos' || imagem.getAttribute('data-periodo') === filtro) {
+                imagem.style.display = 'block';
+            } else {
+                imagem.style.display = 'none';
+            }
+        });
+    }
+    
+    // Função para adicionar eventos de clique às imagens
+    function adicionarEventosClique() {
+        const galeriaItens = document.querySelectorAll('.galeria-item img');
+        
+        galeriaItens.forEach(img => {
+            img.addEventListener('click', function() {
+                const legenda = this.getAttribute('data-legenda');
+                const fullImageSrc = this.getAttribute('data-full');
+                
+                // Mostrar indicador de carregamento no modal
+                modalImg.src = '';
+                modalLegenda.innerHTML = '<div class="loading-indicator">Carregando imagem completa...</div>';
+                
+                // Exibir o modal com animação
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.style.opacity = 1;
+                    modal.style.transition = 'opacity 0.3s ease';
+                }, 50);
+                
+                // Carregar a imagem completa
+                const fullImage = new Image();
+                fullImage.onload = function() {
+                    // Atualizar o conteúdo do modal com a imagem completa
+                    modalImg.src = fullImageSrc;
+                    modalTitulo.textContent = img.alt;
+                    modalLegenda.innerHTML = legenda;
+                };
+                fullImage.onerror = function() {
+                    modalLegenda.innerHTML = `${legenda}<p class="erro">Erro ao carregar a imagem completa.</p>`;
+                    modalImg.src = img.src; // Usa a miniatura como fallback
+                };
+                fullImage.src = fullImageSrc;
             });
         });
-    });
-    
-    // Abrir modal ao clicar em uma imagem
-    zoomIcons.forEach(icon => {
-        icon.addEventListener('click', function() {
-            const itemGaleria = this.closest('.item-galeria');
-            const img = itemGaleria.querySelector('img');
-            const legenda = itemGaleria.querySelector('.legenda').innerHTML;
-            
-            // Definir a imagem e legenda no modal
-            modalImg.src = img.src;
-            modalLegenda.innerHTML = legenda;
-            
-            // Exibir o modal com animação
-            modal.style.display = 'block';
-            setTimeout(() => {
-                modal.style.opacity = 1;
-                modal.style.transition = 'opacity 0.3s ease';
-            }, 50);
-        });
-    });
+    }
     
     // Fechar modal ao clicar no botão de fechar
     fecharModal.addEventListener('click', function() {
@@ -70,28 +164,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
     
-    // Fechar modal ao clicar fora da imagem
-    modal.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.style.opacity = 0;
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
-    });
-    
-    // Criar diretório para imagens se não existir
-    function verificarDiretorioImagens() {
-        // Esta função seria implementada no backend
-        console.log('Verificando diretório de imagens...');
+    // Função para adicionar novas imagens (para uso futuro)
+    function adicionarNovaImagem(imagemData) {
+        // Esta função poderia ser usada para adicionar novas imagens dinamicamente
+        // sem precisar recarregar a página
+        adicionarImagemNaGaleria(imagemData);
+        adicionarEventosClique();
     }
-    
-    // Função para carregar mais imagens (implementação futura)
-    function carregarMaisImagens() {
-        // Implementação futura para carregar mais imagens via AJAX
-        console.log('Função para carregar mais imagens via AJAX');
-    }
-    
-    // Inicialização
-    verificarDiretorioImagens();
 });

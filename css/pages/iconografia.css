@@ -45,7 +45,7 @@
 }
 
 /* Filtros de Iconografia */
-.filtros-iconografia {
+.filtros-container {
   background: #fff;
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
@@ -53,15 +53,6 @@
   max-width: 850px;
   margin: 0 auto 2rem auto;
   text-align: center;
-}
-
-.filtros-iconografia h3 {
-  color: var(--color-primary);
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-.filtro-buttons {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -83,101 +74,82 @@
   background: var(--color-bg-hover);
 }
 
-.filtro-btn.active {
+.filtro-btn.ativo {
   background: var(--color-primary);
   color: white;
   border-color: var(--color-primary);
 }
 
 /* Galeria de Imagens */
-.galeria-iconografia {
+.galeria-section {
   max-width: 1200px;
   margin: 0 auto 3rem auto;
 }
 
-.galeria-grid {
+.galeria-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
   padding: 0 1rem;
+  margin-top: 2rem;
 }
 
-.item-galeria {
+.galeria-item {
   background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--shadow-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
-.item-galeria:hover {
+.galeria-item:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 
-.imagem-container {
-  position: relative;
-  overflow: hidden;
-  height: 220px;
-}
-
-.imagem-container img {
+.galeria-item img {
   width: 100%;
-  height: 100%;
+  height: 220px;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.imagem-container:hover img {
+.galeria-item:hover img {
   transform: scale(1.05);
 }
 
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.imagem-container:hover .overlay {
-  opacity: 1;
-}
-
-.zoom-icon {
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
-}
-
-.legenda {
+.galeria-info {
   padding: 1.2rem;
 }
 
-.legenda h4 {
+.galeria-info h3 {
   color: var(--color-primary);
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
 
-.legenda p {
+.galeria-info p {
   color: var(--color-text);
   font-size: 0.95rem;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.2rem;
   line-height: 1.5;
 }
 
-.fonte {
-  display: block;
+.carregando {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
   color: var(--color-text-muted);
-  font-size: 0.85rem;
-  font-style: italic;
+}
+
+.erro-carregamento {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  border-radius: 8px;
 }
 
 /* Modal para visualização ampliada */
@@ -192,25 +164,48 @@
   height: 100%;
   overflow: auto;
   background-color: rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.modal-conteudo {
+#modal-img {
   margin: auto;
   display: block;
   max-width: 90%;
-  max-height: 80%;
+  max-height: 70%;
   object-fit: contain;
+  border-radius: 4px;
 }
 
-.modal-legenda {
-  margin: auto;
+#modal-titulo {
+  margin: 15px auto 5px;
   display: block;
   width: 80%;
   max-width: 700px;
   text-align: center;
   color: white;
+  font-size: 1.5rem;
+}
+
+#modal-legenda {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: left;
+  color: white;
   padding: 10px 0;
-  height: 150px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#modal-legenda p {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+#modal-legenda strong {
+  color: #ddd;
 }
 
 .fechar-modal {
@@ -233,22 +228,31 @@
 
 /* Responsividade */
 @media only screen and (max-width: 768px) {
-  .galeria-grid {
+  .galeria-container {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
   }
   
-  .imagem-container {
+  .galeria-item img {
     height: 180px;
   }
   
-  .modal-conteudo {
+  #modal-img {
     max-width: 95%;
+  }
+  
+  #modal-titulo {
+    width: 95%;
+    font-size: 1.3rem;
+  }
+  
+  #modal-legenda {
+    width: 95%;
   }
 }
 
 @media only screen and (max-width: 480px) {
-  .filtro-buttons {
+  .filtros-container {
     flex-direction: column;
     align-items: center;
   }
@@ -257,8 +261,16 @@
     width: 80%;
   }
   
-  .galeria-grid {
+  .galeria-container {
     grid-template-columns: 1fr;
     padding: 0 0.5rem;
+  }
+  
+  .apresentacao h2 {
+    font-size: 1.5rem;
+  }
+  
+  .apresentacao p {
+    font-size: 1rem;
   }
 }

@@ -48,113 +48,30 @@
     </blockquote>
   </section>
 
-  <!-- Filtros de Iconografia -->
-  <section class="filtros-iconografia">
-    <h3>Filtrar por período</h3>
-    <div class="filtro-buttons">
-      <button class="filtro-btn active" data-periodo="todos">Todos</button>
-      <button class="filtro-btn" data-periodo="seculo-xix">Século XIX</button>
-      <button class="filtro-btn" data-periodo="1900-1950">1900-1950</button>
-      <button class="filtro-btn" data-periodo="1951-2000">1951-2000</button>
-      <button class="filtro-btn" data-periodo="2001-atual">2001-Atual</button>
-    </div>
-  </section>
-
   <!-- Galeria de Imagens -->
-  <section class="galeria-iconografia">
-    <div class="galeria-grid">
-      <!-- As imagens serão adicionadas aqui conforme disponibilidade -->
-      <div class="item-galeria" data-periodo="seculo-xix">
-        <div class="imagem-container">
-          <img src="images/iconografia/planta_topographica_1833.jpg" alt="Planta Topographica da Cidade de Nictheroy (1833)">
-          <div class="overlay">
-            <div class="zoom-icon">🔍</div>
-          </div>
-        </div>
-        <div class="legenda">
-          <h4>Planta Topographica da Cidade de Nictheroy (1833)</h4>
-          <p>Uma das primeiras representações cartográficas detalhadas da cidade após sua elevação à categoria de capital da província.</p>
-          <span class="fonte">Fonte: Arquivo Nacional</span>
-        </div>
-      </div>
-
-      <div class="item-galeria" data-periodo="seculo-xix">
-        <div class="imagem-container">
-          <img src="images/iconografia/vista_praia_grande_1850.jpg" alt="Vista da Praia Grande (c.1850)">
-          <div class="overlay">
-            <div class="zoom-icon">🔍</div>
-          </div>
-        </div>
-        <div class="legenda">
-          <h4>Vista da Praia Grande (c.1850)</h4>
-          <p>Panorama da região central de Niterói vista a partir da Baía de Guanabara, mostrando o desenvolvimento inicial da cidade.</p>
-          <span class="fonte">Fonte: Biblioteca Nacional</span>
-        </div>
-      </div>
-
-      <div class="item-galeria" data-periodo="1900-1950">
-        <div class="imagem-container">
-          <img src="images/iconografia/praca_republica_1920.jpg" alt="Praça da República (c.1920)">
-          <div class="overlay">
-            <div class="zoom-icon">🔍</div>
-          </div>
-        </div>
-        <div class="legenda">
-          <h4>Praça da República (c.1920)</h4>
-          <p>Vista da Praça da República (atual Arariboia) com os bondes e o movimento urbano do início do século XX.</p>
-          <span class="fonte">Fonte: Arquivo Público de Niterói</span>
-        </div>
-      </div>
-
-      <div class="item-galeria" data-periodo="1900-1950">
-        <div class="imagem-container">
-          <img src="images/iconografia/icarai_1940.jpg" alt="Praia de Icaraí (1940)">
-          <div class="overlay">
-            <div class="zoom-icon">🔍</div>
-          </div>
-        </div>
-        <div class="legenda">
-          <h4>Praia de Icaraí (1940)</h4>
-          <p>Vista da orla de Icaraí antes da verticalização, mostrando as residências e o calçadão da época.</p>
-          <span class="fonte">Fonte: Coleção particular</span>
-        </div>
-      </div>
-
-      <div class="item-galeria" data-periodo="1951-2000">
-        <div class="imagem-container">
-          <img src="images/iconografia/ponte_rio_niteroi_1974.jpg" alt="Inauguração da Ponte Rio-Niterói (1974)">
-          <div class="overlay">
-            <div class="zoom-icon">🔍</div>
-          </div>
-        </div>
-        <div class="legenda">
-          <h4>Inauguração da Ponte Rio-Niterói (1974)</h4>
-          <p>Registro da inauguração da Ponte Presidente Costa e Silva, marco na história da conexão entre Niterói e Rio de Janeiro.</p>
-          <span class="fonte">Fonte: Arquivo Nacional</span>
-        </div>
-      </div>
-
-      <div class="item-galeria" data-periodo="2001-atual">
-        <div class="imagem-container">
-          <img src="images/iconografia/mac_2010.jpg" alt="Museu de Arte Contemporânea (2010)">
-          <div class="overlay">
-            <div class="zoom-icon">🔍</div>
-          </div>
-        </div>
-        <div class="legenda">
-          <h4>Museu de Arte Contemporânea (2010)</h4>
-          <p>Vista aérea do MAC de Niterói, projeto de Oscar Niemeyer que se tornou símbolo da cidade.</p>
-          <span class="fonte">Fonte: Prefeitura de Niterói</span>
-        </div>
+  <section class="galeria-section">
+    <div class="filtros-container">
+      <button class="filtro-btn ativo" data-filtro="todos">Todos os Períodos</button>
+      <button class="filtro-btn" data-filtro="seculo-xix">Século XIX</button>
+      <button class="filtro-btn" data-filtro="1900-1950">1900-1950</button>
+      <button class="filtro-btn" data-filtro="1951-2000">1951-2000</button>
+      <button class="filtro-btn" data-filtro="2001-atual">2001-atual</button>
+    </div>
+    
+    <div class="galeria-container">
+      <!-- Os itens da galeria serão carregados dinamicamente via JavaScript -->
+      <div class="carregando">
+        <p>Carregando imagens...</p>
       </div>
     </div>
   </section>
-
+  
   <!-- Modal para visualização ampliada -->
-  <div class="modal-iconografia">
+  <div id="imagem-modal" class="modal-iconografia">
     <span class="fechar-modal">&times;</span>
-    <img class="modal-conteudo" id="img-ampliada">
-    <div class="modal-legenda"></div>
+    <img id="modal-img" src="" alt="Imagem Ampliada">
+    <h3 id="modal-titulo"></h3>
+    <div id="modal-legenda" class="modal-legenda"></div>
   </div>
 
   <!-- Footer Section -->

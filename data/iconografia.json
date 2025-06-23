@@ -1,0 +1,102 @@
+{
+  "imagens": [
+    {
+      "id": "img001",
+      "arquivos": {
+        "thumb": "AN_br_rjanrio_f2_0_map_0465_d0001de0001_thumb.webp",
+        "full": "AN_br_rjanrio_f2_0_map_0465_d0001de0001_Imagem.webp"
+      },
+      "titulo": "Vista da Praia Grande",
+      "ano": 1850,
+      "periodo": "seculo-xix",
+      "autor": "Desconhecido",
+      "fonte": "Arquivo Público de Niterói",
+      "descricao": "Vista panorâmica da Praia Grande (atual centro de Niterói) em meados do século XIX, mostrando o início da ocupação urbana da região.",
+      "tags": ["praia grande", "centro", "século xix", "paisagem"]
+    },
+    {
+      "id": "img002",
+      "arquivos": {
+        "thumb": "palacio_imperial_1870_thumb.webp",
+        "full": "palacio_imperial_1870.jpg"
+      },
+      "titulo": "Palácio Imperial em Niterói",
+      "ano": 1870,
+      "periodo": "seculo-xix",
+      "autor": "Victor Frond",
+      "fonte": "Biblioteca Nacional",
+      "descricao": "Fotografia do Palácio Imperial em Niterói, residência de verão da família imperial durante o período do Segundo Reinado.",
+      "tags": ["palácio imperial", "império", "século xix", "arquitetura"]
+    },
+    {
+      "id": "img003",
+      "arquivos": {
+        "thumb": "barca_1910_thumb.webp",
+        "full": "barca_1910.jpg"
+      },
+      "titulo": "Barca Rio-Niterói",
+      "ano": 1910,
+      "periodo": "1900-1950",
+      "autor": "Augusto Malta",
+      "fonte": "Arquivo Nacional",
+      "descricao": "Fotografia de uma das primeiras barcas que faziam a travessia regular entre Rio de Janeiro e Niterói no início do século XX.",
+      "tags": ["barca", "transporte", "baía de guanabara", "início século xx"]
+    },
+    {
+      "id": "img004",
+      "arquivos": {
+        "thumb": "praca_republica_1925_thumb.webp",
+        "full": "praca_republica_1925.jpg"
+      },
+      "titulo": "Praça da República",
+      "ano": 1925,
+      "periodo": "1900-1950",
+      "autor": "Desconhecido",
+      "fonte": "Arquivo Público de Niterói",
+      "descricao": "Vista da Praça da República (atual Praça Arariboia) em 1925, importante centro comercial e de transporte da cidade.",
+      "tags": ["praça da república", "praça arariboia", "centro", "década de 1920"]
+    },
+    {
+      "id": "img005",
+      "arquivos": {
+        "thumb": "icarai_1940_thumb.webp",
+        "full": "icarai_1940.jpg"
+      },
+      "titulo": "Praia de Icaraí",
+      "ano": 1940,
+      "periodo": "1900-1950",
+      "autor": "José Maria",
+      "fonte": "Coleção Particular",
+      "descricao": "Vista da Praia de Icaraí na década de 1940, mostrando o início da verticalização do bairro e o calçadão recém-construído.",
+      "tags": ["icaraí", "praia", "década de 1940", "urbanização"]
+    },
+    {
+      "id": "img006",
+      "arquivos": {
+        "thumb": "ponte_1970_thumb.webp",
+        "full": "ponte_1970.jpg"
+      },
+      "titulo": "Construção da Ponte Rio-Niterói",
+      "ano": 1970,
+      "periodo": "1951-2000",
+      "autor": "Departamento Nacional de Estradas de Rodagem",
+      "fonte": "Arquivo Nacional",
+      "descricao": "Fotografia aérea da construção da Ponte Presidente Costa e Silva (Ponte Rio-Niterói) em 1970, um dos marcos da engenharia brasileira.",
+      "tags": ["ponte rio-niterói", "construção", "década de 1970", "infraestrutura"]
+    },
+    {
+      "id": "img007",
+      "arquivos": {
+        "thumb": "mac_1996_thumb.webp",
+        "full": "mac_1996.jpg"
+      },
+      "titulo": "Museu de Arte Contemporânea",
+      "ano": 1996,
+      "periodo": "1951-2000",
+      "autor": "Secretaria de Cultura de Niterói",
+      "fonte": "Prefeitura Municipal de Niterói",
+      "descricao": "O Museu de Arte Contemporânea (MAC) de Niterói, projetado por Oscar Niemeyer, logo após sua inauguração em 1996.",
+      "tags": ["mac", "niemeyer", "arquitetura", "década de 1990", "cultura"]
+    }
+  ]
+}
