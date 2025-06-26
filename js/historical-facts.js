@@ -14,8 +14,17 @@ class HistoricalFactsManager {
     this.currentYear = parseInt(this.timeline.value);
     this.facts = this.loadHistoricalFacts();
     this.locationMarker = null; // Marcador para destacar localização
+    this.activeFilters = []; // Filtros ativos (vazio = mostrar todos)
+    this.categories = [
+      { id: 'politica', name: 'Política', color: '#e74c3c' },
+      { id: 'urbanismo', name: 'Urbanismo', color: '#3498db' },
+      { id: 'cultura', name: 'Cultura', color: '#9b59b6' },
+      { id: 'transporte', name: 'Transporte', color: '#2ecc71' },
+      { id: 'social', name: 'Social', color: '#f39c12' }
+    ];
     
     this.initEventListeners();
+    this.createFilterButtons();
     this.updateFactsForYear(this.currentYear);
   }
   
@@ -28,6 +37,78 @@ class HistoricalFactsManager {
       this.currentYear = parseInt(this.timeline.value);
       this.updateFactsForYear(this.currentYear);
     });
+  }
+  
+  createFilterButtons() {
+    // Criar container para os filtros se não existir
+    if (!document.getElementById('facts-filters')) {
+      const filtersContainer = document.createElement('div');
+      filtersContainer.id = 'facts-filters';
+      filtersContainer.className = 'facts-filters';
+      
+      // Botão "Todos" para limpar filtros
+      const allButton = document.createElement('button');
+      allButton.className = 'filter-button active';
+      allButton.textContent = 'Todos';
+      allButton.addEventListener('click', () => {
+        this.activeFilters = [];
+        
+        // Atualizar estado visual dos botões
+        document.querySelectorAll('.filter-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        allButton.classList.add('active');
+        
+        this.updateFactsForYear(this.currentYear);
+      });
+      filtersContainer.appendChild(allButton);
+      
+      // Criar um botão para cada categoria
+      this.categories.forEach(category => {
+        const button = document.createElement('button');
+        button.className = 'filter-button';
+        button.dataset.category = category.id;
+        button.style.borderColor = category.color;
+        
+        // Criar indicador de cor
+        const colorDot = document.createElement('span');
+        colorDot.className = 'category-dot';
+        colorDot.style.backgroundColor = category.color;
+        button.appendChild(colorDot);
+        
+        // Adicionar nome da categoria
+        const text = document.createTextNode(category.name);
+        button.appendChild(text);
+        
+        // Adicionar evento de clique para filtrar
+        button.addEventListener('click', () => {
+          // Se já estiver ativo, remover do filtro
+          const index = this.activeFilters.indexOf(category.id);
+          if (index > -1) {
+            this.activeFilters.splice(index, 1);
+            button.classList.remove('active');
+          } else {
+            // Adicionar ao filtro
+            this.activeFilters.push(category.id);
+            button.classList.add('active');
+          }
+          
+          // Se não houver filtros ativos, ativar o botão "Todos"
+          if (this.activeFilters.length === 0) {
+            allButton.classList.add('active');
+          } else {
+            allButton.classList.remove('active');
+          }
+          
+          this.updateFactsForYear(this.currentYear);
+        });
+        
+        filtersContainer.appendChild(button);
+      });
+      
+      // Inserir antes do container de fatos
+      this.factsPanel.insertBefore(filtersContainer, this.factsContainer);
+    }
   }
   
   toggleFactsPanel() {
@@ -47,15 +128,25 @@ class HistoricalFactsManager {
     this.factsContainer.innerHTML = '';
     
     // Filtrar fatos relevantes (do ano atual e até 10 anos antes)
-    const relevantFacts = this.facts.filter(fact => 
+    let relevantFacts = this.facts.filter(fact => 
       fact.year <= year && fact.year >= year - 10
-    ).sort((a, b) => b.year - a.year); // Ordenar do mais recente para o mais antigo
+    );
+    
+    // Aplicar filtro por categoria, se houver filtros ativos
+    if (this.activeFilters.length > 0) {
+      relevantFacts = relevantFacts.filter(fact => 
+        this.activeFilters.includes(fact.category)
+      );
+    }
+    
+    // Ordenar do mais recente para o mais antigo
+    relevantFacts.sort((a, b) => b.year - a.year);
     
     if (relevantFacts.length === 0) {
       this.factsContainer.innerHTML = `
         <div class="no-facts">
-          <p>Nenhum fato histórico registrado para este período.</p>
-          <p>Tente mover o controle deslizante para outro ano.</p>
+          <p>Nenhum fato histórico registrado para este período${this.activeFilters.length > 0 ? ' com os filtros selecionados' : ''}.</p>
+          <p>${this.activeFilters.length > 0 ? 'Tente selecionar outras categorias ou ' : ''}Tente mover o controle deslizante para outro ano.</p>
         </div>
       `;
       return;
@@ -65,6 +156,14 @@ class HistoricalFactsManager {
     relevantFacts.forEach(fact => {
       const card = document.createElement('div');
       card.className = 'fact-card';
+      
+      // Adicionar borda colorida baseada na categoria
+      if (fact.category) {
+        const categoryData = this.categories.find(c => c.id === fact.category);
+        if (categoryData) {
+          card.style.borderLeft = `4px solid ${categoryData.color}`;
+        }
+      }
       
       // Botão de navegação para o mapa (apenas se tiver coordenadas)
       let locationButton = '';
@@ -77,8 +176,24 @@ class HistoricalFactsManager {
         `;
       }
       
+      // Badge de categoria
+      let categoryBadge = '';
+      if (fact.category) {
+        const categoryData = this.categories.find(c => c.id === fact.category);
+        if (categoryData) {
+          categoryBadge = `
+            <span class="category-badge" style="background-color: ${categoryData.color}">
+              ${categoryData.name}
+            </span>
+          `;
+        }
+      }
+      
       card.innerHTML = `
-        <div class="fact-year">${fact.year}</div>
+        <div class="fact-header">
+          <div class="fact-year">${fact.year}</div>
+          ${categoryBadge}
+        </div>
         <div class="fact-title">${fact.title}</div>
         <div class="fact-description">${fact.description}</div>
         ${locationButton}
@@ -232,6 +347,7 @@ class HistoricalFactsManager {
         year: 1819,
         title: "Elevação à Vila",
         description: "A Vila Real da Praia Grande foi criada em 10 de maio de 1819, separando-se da cidade do Rio de Janeiro.",
+        category: "politica",
         location: {
           lat: -22.8932,
           lon: -43.1245,
@@ -242,6 +358,7 @@ class HistoricalFactsManager {
         year: 1834,
         title: "Capital da Província",
         description: "A Vila Real da Praia Grande tornou-se a capital da província do Rio de Janeiro em 1834.",
+        category: "politica",
         location: {
           lat: -22.8932,
           lon: -43.1245,
@@ -252,6 +369,7 @@ class HistoricalFactsManager {
         year: 1835,
         title: "Elevação à Cidade",
         description: "Em 22 de novembro de 1835, a Vila Real da Praia Grande foi elevada à categoria de cidade, recebendo o nome de Niterói.",
+        category: "politica",
         location: {
           lat: -22.8932,
           lon: -43.1245,
@@ -262,6 +380,7 @@ class HistoricalFactsManager {
         year: 1841,
         title: "Visita Imperial",
         description: "O Imperador Dom Pedro II fez sua primeira visita oficial à cidade de Niterói.",
+        category: "politica",
         location: {
           lat: -22.8865,
           lon: -43.1205,
@@ -272,6 +391,7 @@ class HistoricalFactsManager {
         year: 1854,
         title: "Primeira Linha de Barcos a Vapor",
         description: "Inauguração da primeira linha regular de barcos a vapor entre Niterói e Rio de Janeiro.",
+        category: "transporte",
         location: {
           lat: -22.8962,
           lon: -43.1230,
@@ -282,16 +402,13 @@ class HistoricalFactsManager {
         year: 1862,
         title: "Iluminação a Gás",
         description: "Niterói recebe iluminação pública a gás, modernizando a cidade.",
-        location: {
-          lat: -22.8900,
-          lon: -43.1190,
-          zoom: 15
-        }
+        category: "urbanismo"
       },
       {
         year: 1872,
         title: "Primeira Linha de Bondes",
         description: "Inauguração da primeira linha de bondes puxados por burros em Niterói.",
+        category: "transporte",
         location: {
           lat: -22.8880,
           lon: -43.1170,
@@ -302,6 +419,7 @@ class HistoricalFactsManager {
         year: 1883,
         title: "Fundação da Biblioteca Pública",
         description: "Criação da Biblioteca Pública de Niterói, importante centro cultural da cidade.",
+        category: "cultura",
         location: {
           lat: -22.8905,
           lon: -43.1175,
@@ -312,6 +430,7 @@ class HistoricalFactsManager {
         year: 1893,
         title: "Revolta da Armada",
         description: "Durante a Revolta da Armada, Niterói foi bombardeada por navios rebeldes, causando grande destruição.",
+        category: "politica",
         location: {
           lat: -22.8962,
           lon: -43.1230,
@@ -322,6 +441,7 @@ class HistoricalFactsManager {
         year: 1903,
         title: "Bondes Elétricos",
         description: "Inauguração dos bondes elétricos em Niterói, substituindo os bondes puxados por tração animal.",
+        category: "transporte",
         location: {
           lat: -22.8880,
           lon: -43.1170,
@@ -332,6 +452,7 @@ class HistoricalFactsManager {
         year: 1908,
         title: "Reforma Urbana",
         description: "Início da grande reforma urbana de Niterói, com abertura de avenidas e modernização da infraestrutura.",
+        category: "urbanismo",
         location: {
           lat: -22.8900,
           lon: -43.1190,

@@ -215,8 +215,8 @@ input[type=range]:focus {
 #timeline-facts-panel {
   max-height: 0;
   overflow: hidden;
-
   margin-top: 5px;
+
 }
 
 #timeline-facts-panel.expanded {
@@ -246,12 +246,98 @@ input[type=range]:focus {
   background: #a8a8a8;
 }
 
-/* Container de cards */
+/* Container de cards - layout horizontal */
 #facts-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Impede a quebra para nova linha */
   gap: 12px;
   padding: 15px;
+  overflow-x: auto; /* Rolagem horizontal */
+  overflow-y: hidden; /* Sem rolagem vertical */
+  scroll-behavior: smooth; /* Rolagem suave */
+  -webkit-overflow-scrolling: touch; /* Rolagem suave em dispositivos touch */
+  scrollbar-width: thin; /* Barra de rolagem fina para Firefox */
+  padding-bottom: 10px; /* Espaço para a barra de rolagem */
+}
+
+/* Estilização da barra de rolagem horizontal para WebKit */
+#facts-container::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+#facts-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+#facts-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+#facts-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Filtros de categorias */
+.facts-filters {
+  display: flex;
+  gap: 8px;
+  padding: 10px 15px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid #eaeaea;
+}
+
+.filter-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: 0.8em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background-color: #f5f5f5;
+}
+
+.filter-button.active {
+  background-color: #f0f0f0;
+  border-width: 2px;
+  font-weight: 500;
+}
+
+.category-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Badge de categoria */
+.category-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.7em;
+  color: white;
+  font-weight: 500;
+}
+
+/* Header do card com ano e categoria */
+.fact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 /* Estilo para mensagem de nenhum fato histórico */
@@ -272,15 +358,58 @@ input[type=range]:focus {
   font-size: 0.9em;
 }
 
-/* Card de fato histórico */
+/* Responsividade para telas pequenas */
+@media screen and (max-width: 576px) {
+  #timeline-facts-panel.expanded {
+    max-height: 220px;
+    height: 220px; /* Altura reduzida em telas pequenas */
+  }
+  
+  #facts-container {
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .fact-card {
+    width: 200px; /* Cards menores em telas pequenas */
+    min-width: 180px;
+    padding: 10px;
+  }
+  
+  .fact-year {
+    font-size: 1em;
+  }
+  
+  .fact-title {
+    font-size: 0.95em;
+  }
+  
+  .fact-description {
+    font-size: 0.85em;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+  
+  .location-button {
+    padding: 5px 8px;
+    font-size: 0.8em;
+  }
+  
+  .location-button svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Card de fato histórico - layout horizontal */
 .fact-card {
-  flex: 1 1 200px;
+  flex: 0 0 auto; /* Não cresce nem encolhe */
+  width: 250px; /* Largura fixa para os cards */
   min-width: 200px;
-  max-width: 300px;
   background-color: #fff;
   border-radius: 8px;
   padding: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
 }
