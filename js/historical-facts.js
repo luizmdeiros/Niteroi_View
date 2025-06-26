@@ -54,7 +54,8 @@ class HistoricalFactsManager {
     if (relevantFacts.length === 0) {
       this.factsContainer.innerHTML = `
         <div class="no-facts">
-          Nenhum fato histórico registrado para este período.
+          <p>Nenhum fato histórico registrado para este período.</p>
+          <p>Tente mover o controle deslizante para outro ano.</p>
         </div>
       `;
       return;
