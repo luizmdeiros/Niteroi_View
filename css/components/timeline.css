@@ -170,3 +170,153 @@ input[type=range]:focus {
     min-width: 20px;
   }
 }
+
+/* Botão de fatos históricos */
+#timeline-facts-toggle {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-sm);
+}
+
+#facts-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-primary-light, rgba(0, 120, 215, 0.1));
+  border: none;
+  border-radius: var(--border-radius-md, 4px);
+  padding: var(--spacing-xs, 4px) var(--spacing-md, 12px);
+  font-family: var(--font-family-secondary, inherit);
+  font-size: var(--font-size-sm, 14px);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary-dark, #005a9e);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#facts-button:hover {
+  background: var(--color-primary, #0078d7);
+  color: white;
+}
+
+.facts-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transition: transform 0.3s ease;
+}
+
+/* Rotação do ícone quando expandido */
+#facts-button.expanded .facts-icon {
+  transform: rotate(180deg);
+}
+
+/* Painel de fatos históricos */
+#timeline-facts-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  width: 100%;
+}
+
+#timeline-facts-panel.expanded {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: var(--spacing-md, 12px);
+}
+
+/* Container de cards */
+#facts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm, 8px);
+  padding: var(--spacing-xs, 4px);
+}
+
+/* Card de fato histórico */
+.fact-card {
+  flex: 1 1 200px;
+  min-width: 200px;
+  max-width: 300px;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.fact-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.fact-year {
+  font-weight: bold;
+  color: #1976d2;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+}
+
+.fact-title {
+  font-weight: bold;
+  margin-bottom: 6px;
+  font-size: 1em;
+}
+
+.fact-description {
+  font-size: 0.9em;
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+/* Botão de localização */
+.location-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f7ff;
+  border: 1px solid #c2e0ff;
+  color: #0066cc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.location-button:hover {
+  background-color: #d4e9ff;
+  border-color: #99ccff;
+}
+
+.location-button svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  fill: currentColor;
+}
+
+/* Animação de pulsação para o botão */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.location-button:active {
+  animation: pulse 0.3s ease-in-out;
+  background-color: #b3d9ff;
+  color: var(--text-secondary, #666);
+}
+
+.no-facts {
+  width: 100%;
+  text-align: center;
+  padding: var(--spacing-md, 12px);
+  color: var(--text-secondary, #666);
+  font-style: italic;
+}

@@ -74,6 +74,21 @@
         <span id="year-value">2020</span>
       </div>
     </div>
+    
+    <!-- Botão de expansão para fatos históricos -->
+    <div id="timeline-facts-toggle">
+      <button id="facts-button">
+        <span>Fatos Históricos</span>
+        <svg class="facts-icon" viewBox="0 0 24 24"><path d="M7,10L12,15L17,10H7Z"></path></svg>
+      </button>
+    </div>
+    
+    <!-- Painel expansível de fatos históricos -->
+    <div id="timeline-facts-panel">
+      <div id="facts-container">
+        <!-- Os cards de fatos serão inseridos aqui dinamicamente -->
+      </div>
+    </div>
   </div>
   <script src="js/canvas-optimization.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
@@ -90,6 +105,7 @@
   <script src="styles/Logradouros_6_style.js"></script>
   <script src="styles/EdifciosHistricos_7_style.js"></script>
   <script src="js/popups.js"></script>
+  <script src="js/historical-facts.js"></script>
   <script>
     // Função para gerar ticks de anos responsivos
     function renderTimelineTicks() {
@@ -321,7 +337,9 @@
 
     // Inicializa o sistema de popups (apenas para Logradouros e Edifícios Históricos)
     const popupManager = new PopupManager(map, logradourosLayer, edifLayer);
-  
+    
+    // Carrega o sistema de fatos históricos com referência ao mapa
+    const factsManager = new HistoricalFactsManager(timeline, map);
   </script>
 </body>
 </html>
