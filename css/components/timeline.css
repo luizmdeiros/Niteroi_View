@@ -361,8 +361,8 @@ input[type=range]:focus {
 /* Responsividade para telas pequenas */
 @media screen and (max-width: 576px) {
   #timeline-facts-panel.expanded {
-    max-height: 220px;
-    height: 220px; /* Altura reduzida em telas pequenas */
+    max-height: 300px;
+    height: 300px; /* Altura reduzida em telas pequenas */
   }
   
   #facts-container {
