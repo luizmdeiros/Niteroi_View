@@ -343,17 +343,25 @@ class HistoricalFactsManager {
   loadHistoricalFacts() {
     // Dados estáticos de exemplo - podem ser carregados de um JSON externo no futuro
     return [
+      /*
       {
         year: 1819,
         title: "Elevação à Vila",
         description: "A Vila Real da Praia Grande foi criada em 10 de maio de 1819, separando-se da cidade do Rio de Janeiro.",
         category: "politica",
+      },
+      {
+        year: 1820,
+        title: "Criação do primeiro plano de arumentos",
+        description: "Encomendado pelo primeiro Juiz de Fora entregue em 5 de fevereiro de 1820 o plano deu origem as primeiras ruas do centro.",
+        category: "urbanismo",
         location: {
-          lat: -22.8932,
-          lon: -43.1245,
+          lat: -22.8898,
+          lon: -43.1220,
           zoom: 15
         }
       },
+
       {
         year: 1834,
         title: "Capital da Província",
@@ -384,6 +392,17 @@ class HistoricalFactsManager {
         location: {
           lat: -22.8865,
           lon: -43.1205,
+          zoom: 16
+        }
+      },
+      {
+        year: 1849,
+        title: "Demolição paricial da Pedra de Itapuca",
+        description: "A Pedra de Itapuca foi demolida parcialmente em 1849, para a contução da avenida ligando os bairros do Ingá a Icaraí.",
+        category: "Urbanismo",
+        location: {
+          lat: -22.9056,
+          lon: -43.1198,
           zoom: 16
         }
       },
@@ -458,7 +477,7 @@ class HistoricalFactsManager {
           lon: -43.1190,
           zoom: 15
         }
-      }
+      }*/
     ];
   }
 }

@@ -75,12 +75,22 @@
       </div>
     </div>
     
-    <!-- Botão de expansão para fatos históricos -->
-    <div id="timeline-facts-toggle">
-      <button id="facts-button">
-        <span>Fatos Históricos</span>
-        <svg class="facts-icon" viewBox="0 0 24 24"><path d="M7,10L12,15L17,10H7Z"></path></svg>
-      </button>
+    <!-- Botões de controle -->
+    <div id="timeline-controls">
+      <!-- Botão de expansão para fatos históricos -->
+      <div id="timeline-facts-toggle">
+        <button id="facts-button">
+          <span>Fatos Históricos</span>
+          <svg class="facts-icon" viewBox="0 0 24 24"><path d="M7,10L12,15L17,10H7Z"></path></svg>
+        </button>
+      </div>
+      
+      <!-- Botão para alternar camada de satélite -->
+      <div id="satellite-toggle">
+        <button id="satellite-button">
+          <span>Satélite</span>
+        </button>
+      </div>
     </div>
     
     <!-- Painel expansível de fatos históricos -->
@@ -92,6 +102,12 @@
   </div>
   <script src="js/canvas-optimization.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+  <!-- Adicionar ol-layerswitcher para gerenciar camadas -->
+  <script src="https://unpkg.com/ol-layerswitcher@4.1.1/dist/ol-layerswitcher.js"></script>
+  <!-- Google Maps API para camada de satélite -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=" async defer></script>
+  <!-- Script de busca -->
+  <script src="js/search.js"></script>
   <script src="data/Agua_Niteroi_0.js"></script>
   <script src="data/Terreno_Niteroi_1.js"></script>
   <script src="data/Lagunas_2.js"></script>
@@ -275,6 +291,21 @@
       });
     }
 
+    // Camada do Google Maps Satellite
+    const googleSatellite = new ol.layer.Tile({
+      source: new ol.source.XYZ({
+        url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        maxZoom: 20,
+        attributions: '© Google'
+      }),
+      visible: false,  // Inicialmente invisível
+      zIndex: 100,    // Acima das outras camadas
+      // Otimizações de renderização
+      updateWhileAnimating: false,
+      updateWhileInteracting: false,
+      preload: 1
+    });
+    
     // Mapa
     const map = new ol.Map({
       target: 'map',
@@ -285,7 +316,8 @@
         lagunasLayer,
         areaUrbanaLayer,
         logradourosLayer,
-        edifLayer
+        edifLayer,
+        googleSatellite  // Adicionando a camada do Google Maps
       ],
       view: new ol.View({
         center: ol.proj.fromLonLat([-43.103, -22.903]),
@@ -340,6 +372,41 @@
     
     // Carrega o sistema de fatos históricos com referência ao mapa
     const factsManager = new HistoricalFactsManager(timeline, map);
+    
+    // Inicializa o sistema de busca
+    const searchManager = new SearchManager(map, logradourosLayer, edifLayer);
+    
+    // Controle de camada de satélite
+    const satelliteButton = document.getElementById('satellite-button');
+    satelliteButton.addEventListener('click', function() {
+      // Alterna a visibilidade da camada de satélite
+      const isVisible = googleSatellite.getVisible();
+      googleSatellite.setVisible(!isVisible);
+      
+      // Atualiza a aparência do botão
+      this.classList.toggle('active');
+      
+      // Ajusta a opacidade das camadas base quando o satélite está ativo
+      if (!isVisible) {
+        // Satélite ativado: reduz a opacidade das camadas base
+        aguaLayer.setOpacity(0.6);
+        terrenoLayer.setOpacity(0.6);
+        lagunasLayer.setOpacity(0.6);
+        areaUrbanaLayer.setOpacity(0.8);
+        // Mantém as camadas temporais visíveis por cima do satélite
+        logradourosLayer.setOpacity(1);
+        edifLayer.setOpacity(1);
+      } else {
+        // Satélite desativado: restaura a opacidade das camadas base
+        aguaLayer.setOpacity(1);
+        terrenoLayer.setOpacity(1);
+        lagunasLayer.setOpacity(1);
+        areaUrbanaLayer.setOpacity(1);
+      }
+      
+      // Força uma atualização das camadas temporais para garantir boa visualização
+      atualizarCamadasTemporais(anoAtual);
+    });
   </script>
 </body>
 </html>

@@ -302,16 +302,67 @@ class PopupManager {
   }
 
   /**
-   * Exibe o popup na posição especificada
+   * Exibe o popup na posição especificada e garante que fique visível na tela
    */
   showPopup(pixel, content) {
+    // Define o conteúdo do popup
     this.popup.innerHTML = content;
-    this.popup.style.display = 'block';
-    this.popup.style.left = (pixel[0] + 10) + 'px';
-    this.popup.style.top = (pixel[1] - 30) + 'px';
     
     // Adiciona classes CSS para estilização
     this.addPopupStyles();
+    
+    // Torna o popup visível mas fora da tela para medir suas dimensões
+    this.popup.style.display = 'block';
+    this.popup.style.left = '-9999px';
+    this.popup.style.top = '-9999px';
+    
+    // Força um reflow para garantir que as dimensões sejam calculadas
+    void this.popup.offsetWidth;
+    
+    // Agora podemos obter as dimensões reais
+    const popupWidth = this.popup.offsetWidth;
+    const popupHeight = this.popup.offsetHeight;
+    
+    // Obtém dimensões da janela
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Calcula a posição inicial (offset do ponto clicado)
+    let left = pixel[0] + 10;
+    let top = pixel[1] - 30;
+    
+    // Ajusta posição horizontal para garantir visibilidade
+    if (left + popupWidth > windowWidth - 10) {
+      // Se o popup ultrapassar a borda direita, posiciona à esquerda do ponto clicado
+      left = pixel[0] - popupWidth - 10;
+      
+      // Se ainda estiver fora da tela, alinha com a borda esquerda
+      if (left < 10) {
+        left = 10;
+      }
+    }
+    
+    // Ajusta posição vertical para garantir visibilidade
+    if (top + popupHeight > windowHeight - 10) {
+      // Se o popup ultrapassar a borda inferior, posiciona acima do ponto clicado
+      top = pixel[1] - popupHeight - 10;
+      
+      // Se ainda estiver fora da tela, alinha com a borda superior
+      if (top < 10) {
+        top = 10;
+      }
+    }
+    
+    // Garante que o popup não fique sob o header (se houver)
+    const headerHeight = document.querySelector('header') ? 
+      document.querySelector('header').offsetHeight : 0;
+    if (top < headerHeight + 10) {
+      top = headerHeight + 10;
+    }
+    
+    // Aplica a posição ajustada
+    this.popup.style.left = left + 'px';
+    this.popup.style.top = top + 'px';
   }
 
   /**

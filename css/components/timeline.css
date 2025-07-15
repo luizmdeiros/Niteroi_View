@@ -172,16 +172,19 @@ input[type=range]:focus {
 }
 
 /* Botão de fatos históricos */
-#timeline-facts-toggle {
+/* Container de controles */
+#timeline-controls {
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  gap: 10px;
   margin-top: var(--spacing-sm);
 }
 
-#facts-button {
+#facts-button, #satellite-button {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-xs, 5px);
   background: var(--color-primary-light, rgba(0, 120, 215, 0.1));
   border: none;
   border-radius: var(--border-radius-md, 4px);
@@ -192,14 +195,26 @@ input[type=range]:focus {
   color: var(--color-primary-dark, #005a9e);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 32px;
 }
 
-#facts-button:hover {
+#facts-button:hover, #satellite-button:hover {
   background: var(--color-primary, #0078d7);
   color: white;
 }
 
-.facts-icon {
+/* Estilo para botão de satélite ativo */
+#satellite-button.active {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #3e8e41;
+}
+
+#satellite-button.active .satellite-icon {
+  fill: white;
+}
+
+.facts-icon, .satellite-icon {
   width: 18px;
   height: 18px;
   fill: currentColor;
