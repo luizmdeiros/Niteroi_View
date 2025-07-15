@@ -363,6 +363,32 @@ class PopupManager {
     // Aplica a posição ajustada
     this.popup.style.left = left + 'px';
     this.popup.style.top = top + 'px';
+    
+    // Verificação final após renderização para garantir que o popup esteja na tela
+    setTimeout(() => {
+      // Recalcula dimensões após renderização completa
+      const rect = this.popup.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      // Ajusta horizontalmente se necessário
+      if (rect.right > viewportWidth) {
+        left = Math.max(10, viewportWidth - rect.width - 10);
+        this.popup.style.left = left + 'px';
+      }
+      if (rect.left < 0) {
+        this.popup.style.left = '10px';
+      }
+      
+      // Ajusta verticalmente se necessário
+      if (rect.bottom > viewportHeight) {
+        top = Math.max(headerHeight + 10, viewportHeight - rect.height - 10);
+        this.popup.style.top = top + 'px';
+      }
+      if (rect.top < headerHeight) {
+        this.popup.style.top = (headerHeight + 10) + 'px';
+      }
+    }, 0);
   }
 
   /**
