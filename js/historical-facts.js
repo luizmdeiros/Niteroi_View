@@ -343,11 +343,11 @@ class HistoricalFactsManager {
   loadHistoricalFacts() {
     // Dados estáticos de exemplo - podem ser carregados de um JSON externo no futuro
     return [
-      /*
+      
       {
         year: 1819,
         title: "Elevação à Vila",
-        description: "A Vila Real da Praia Grande foi criada em 10 de maio de 1819, separando-se da cidade do Rio de Janeiro.",
+        description: "A Vila Real da Praia Grande foi criada em 10 de maio de 1819.",
         category: "politica",
       },
       {
@@ -363,9 +363,9 @@ class HistoricalFactsManager {
       },
 
       {
-        year: 1834,
+        year: 1835,
         title: "Capital da Província",
-        description: "A Vila Real da Praia Grande tornou-se a capital da província do Rio de Janeiro em 1834.",
+        description: "A Vila Real da Praia Grande tornou-se a capital da província do Rio de Janeiro em 1835.",
         category: "politica",
         location: {
           lat: -22.8932,
@@ -477,7 +477,7 @@ class HistoricalFactsManager {
           lon: -43.1190,
           zoom: 15
         }
-      }*/
+      }
     ];
   }
 }

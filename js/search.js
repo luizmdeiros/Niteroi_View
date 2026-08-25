@@ -28,7 +28,7 @@ class SearchManager {
     // Cria o container de busca
     const searchContainer = document.createElement('div');
     searchContainer.id = 'search-container';
-    searchContainer.className = 'search-container';
+    searchContainer.className = 'search-container collapsed';
     
     // Cria o campo de busca
     const searchForm = document.createElement('div');
@@ -74,7 +74,7 @@ class SearchManager {
         .search-container {
           position: absolute;
           top: 10px;
-          left: 10px;
+          left: 40px;
           z-index: 1000;
           width: 300px;
           max-width: 90%;
@@ -82,11 +82,25 @@ class SearchManager {
           border-radius: 8px;
           box-shadow: 0 2px 6px rgba(0,0,0,0.3);
           overflow: hidden;
+          transition: width 0.3s ease;
+        }
+        
+        /* Estilo para o container colapsado (apenas mostra o botão) */
+        .search-container.collapsed {
+          width: 40px;
+          overflow: hidden;
+        }
+        
+        .search-container.collapsed #search-input {
+          width: 0;
+          padding: 0;
+          opacity: 0;
         }
         
         .search-form {
           display: flex;
           border-bottom: 1px solid #eee;
+          width: 100%;
         }
         
         #search-input {
@@ -96,18 +110,20 @@ class SearchManager {
           outline: none;
           font-size: 14px;
           font-family: Arial, sans-serif;
+          transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
         }
         
         #search-button {
           background: #1976d2;
           border: none;
           color: white;
-          width: 40px;
+          min-width: 40px;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           transition: background 0.2s;
+          flex-shrink: 0;
         }
         
         #search-button:hover {
@@ -141,41 +157,49 @@ class SearchManager {
           background: #f5f5f5;
         }
         
-        .search-result-item:last-child {
-          border-bottom: none;
-        }
-        
-        .result-title {
+        .search-result-title {
           font-weight: bold;
-          color: #1976d2;
           margin-bottom: 3px;
         }
         
-        .result-info {
+        .search-result-info {
           font-size: 12px;
           color: #666;
+          margin-bottom: 3px;
         }
         
-        .result-type {
+        .search-result-type {
           font-size: 11px;
-          background: #e3f2fd;
           color: #1976d2;
-          padding: 2px 6px;
-          border-radius: 10px;
-          display: inline-block;
-          margin-top: 3px;
+          text-transform: uppercase;
         }
         
-        .no-results {
+        .search-no-results {
           padding: 15px;
           text-align: center;
           color: #666;
         }
         
-        @media (max-width: 600px) {
+        .search-results-count {
+          padding: 8px 15px;
+          font-size: 12px;
+          background: #f5f5f5;
+          border-bottom: 1px solid #eee;
+        }
+        
+        .search-results-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        
+        @media (max-width: 768px) {
           .search-container {
-            width: calc(100% - 20px);
-            max-width: none;
+            width: 250px;
+          }
+          
+          .search-container.collapsed {
+            width: 40px;
           }
         }
       `;
@@ -187,22 +211,53 @@ class SearchManager {
    * Adiciona event listeners
    */
   attachEventListeners() {
+    const searchButton = document.getElementById('search-button');
+    const searchInput = document.getElementById('search-input');
+    const searchContainer = document.getElementById('search-container');
+    
     // Evento de clique no botão de busca
-    document.getElementById('search-button').addEventListener('click', () => {
+    searchButton.addEventListener('click', (e) => {
+      // Se a caixa de busca estiver colapsada, expande ela
+      if (searchContainer.classList.contains('collapsed')) {
+        searchContainer.classList.remove('collapsed');
+        searchInput.focus();
+        e.preventDefault(); // Evita a busca no primeiro clique
+        return;
+      }
+      
+      // Se já estiver expandida, realiza a busca
       this.performSearch();
     });
     
     // Evento de pressionar Enter no campo de busca
-    this.searchInput.addEventListener('keypress', (e) => {
+    searchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         this.performSearch();
       }
     });
     
-    // Evento para limpar resultados quando o campo fica vazio
-    this.searchInput.addEventListener('input', () => {
-      if (this.searchInput.value.trim() === '') {
-        this.clearResults();
+    // Evento de foco no campo de busca (mostra resultados anteriores)
+    searchInput.addEventListener('focus', () => {
+      if (this.searchResults.length > 0) {
+        this.resultsContainer.classList.add('active');
+      }
+    });
+    
+    // Evento de clique fora da caixa de busca (colapsa a caixa)
+    document.addEventListener('click', (e) => {
+      // Verifica se o clique foi fora do container de busca
+      if (!searchContainer.contains(e.target)) {
+        // Só colapsa se não houver texto no input e não houver resultados ativos
+        if (searchInput.value.trim() === '' && !this.resultsContainer.classList.contains('active')) {
+          searchContainer.classList.add('collapsed');
+        }
+      }
+    });
+    
+    // Evento de limpar o campo de busca (colapsa a caixa se não houver resultados)
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value.trim() === '' && !this.resultsContainer.classList.contains('active')) {
+        // Não colapsa imediatamente para permitir que o usuário digite
       }
     });
   }
@@ -355,6 +410,7 @@ class SearchManager {
   /**
    * Busca em logradouros (ruas)
    */
+  
   searchInLogradouros(query) {
     const features = this.logradourosLayer.getSource().getFeatures();
     const normalizedQuery = this.normalizeString(query);
@@ -368,7 +424,7 @@ class SearchManager {
       const nomePopNorm = props.nome_pop ? this.normalizeString(props.nome_pop) : '';
       const noAntNorm = props.no_ant ? this.normalizeString(props.no_ant) : '';
       const bairroEsqNorm = props.bairro_esq ? this.normalizeString(props.bairro_esq) : '';
-      const tipoLogradouro = props.tipo_logra ? this.normalizeString(props.tipo_logra) : '';
+      const tipoLogradouro = props.tipo ? this.normalizeString(props.tipo) : '';
       
       // Combina nome com tipo de logradouro para busca mais eficiente
       const fullNameNorm = `${tipoLogradouro} ${nomeComplNorm}`.trim();
@@ -419,16 +475,17 @@ class SearchManager {
   /**
    * Exibe os resultados da busca
    */
-  displayResults() {
-    this.clearResults();
-    
-    if (this.searchResults.length === 0) {
-      const noResults = document.createElement('div');
-      noResults.className = 'search-no-results';
-      noResults.textContent = 'Nenhum resultado encontrado';
-      this.resultsContainer.appendChild(noResults);
-      return;
-    }
+displayResults() {
+  this.resultsContainer.innerHTML = '';                // limpa só o DOM
+  this.resultsContainer.classList.add('active');
+
+  if (this.searchResults.length === 0) {
+    const noResults = document.createElement('div');
+    noResults.className = 'search-no-results';
+    noResults.textContent = 'Nenhum resultado encontrado';
+    this.resultsContainer.appendChild(noResults);
+    return;
+  }
     
     // Ordena resultados por relevância
     this.searchResults.sort((a, b) => {
@@ -521,10 +578,11 @@ class SearchManager {
   /**
    * Limpa os resultados da busca
    */
-  clearResults() {
-    this.searchResults = [];
-    this.resultsContainer.innerHTML = '';
-  }
+clearResults() {
+  this.searchResults = [];
+  this.resultsContainer.innerHTML = '';
+  this.resultsContainer.classList.remove('active');   // <-- ADICIONAR ESTA LINHA
+}
 }
 
 // Exporta a classe para uso global
