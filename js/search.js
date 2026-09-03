@@ -74,7 +74,7 @@ class SearchManager {
         .search-container {
           position: absolute;
           top: 10px;
-          left: 40px;
+          left: 50px;
           z-index: 1000;
           width: 300px;
           max-width: 90%;
@@ -88,6 +88,7 @@ class SearchManager {
         /* Estilo para o container colapsado (apenas mostra o botão) */
         .search-container.collapsed {
           width: 40px;
+          height: 40px;
           overflow: hidden;
         }
         
@@ -99,7 +100,6 @@ class SearchManager {
         
         .search-form {
           display: flex;
-          border-bottom: 1px solid #eee;
           width: 100%;
         }
         
@@ -114,7 +114,7 @@ class SearchManager {
         }
         
         #search-button {
-          background: #1976d2;
+          background: var(--primary-color);
           border: none;
           color: white;
           min-width: 40px;
@@ -124,15 +124,16 @@ class SearchManager {
           justify-content: center;
           transition: background 0.2s;
           flex-shrink: 0;
+          outline: none;     
         }
         
         #search-button:hover {
-          background: #1565c0;
+          background: var(--primary-color);
         }
         
         #search-button svg {
           width: 20px;
-          height: 20px;
+          height: 40px;
           fill: white;
         }
         
@@ -253,7 +254,12 @@ class SearchManager {
         }
       }
     });
-    
+
+    // Evento de clique no mapa (colapsa a caixa de busca)
+this.map.on('click', () => {
+  document.getElementById('search-container').classList.add('collapsed');
+});
+
     // Evento de limpar o campo de busca (colapsa a caixa se não houver resultados)
     searchInput.addEventListener('input', () => {
       if (searchInput.value.trim() === '' && !this.resultsContainer.classList.contains('active')) {
@@ -529,7 +535,10 @@ displayResults() {
       if (result.info) resultItem.appendChild(resultInfo);
       resultItem.appendChild(resultType);
       
-      resultItem.addEventListener('click', () => this.navigateToResult(index));
+      resultItem.addEventListener('click', () => {
+  this.navigateToResult(index);
+  document.getElementById('search-container').classList.add('collapsed');
+});
       
       resultsList.appendChild(resultItem);
     });

@@ -31,10 +31,10 @@ class PopupManager {
       this.popup.id = 'popup';
       this.popup.style.cssText = `
         position: absolute;
-        background: white;
+        background: var(--background-primary);
         padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color);
         bottom: 12px;
         left: -50px;
         min-width: 150px;
@@ -44,8 +44,8 @@ class PopupManager {
         max-height: 200px;
         overflow-y: auto;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        font-family: Arial, sans-serif;
-        font-size: 14px;
+        font-family: var(--font-family-primary);
+        font-size: var(--font-size-base);
         z-index: 100;
         display: none;
         word-wrap: break-word;
@@ -412,7 +412,7 @@ class PopupManager {
         .popup-title {
           font-weight: bold;
           font-size: 16px;
-          color: #1976d2;
+          color: black;
           margin-bottom: 8px;
           border-bottom: 1px solid #e0e0e0;
           padding-bottom: 4px;

@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css">
   <link href="css/main.css" rel="stylesheet" type="text/css">
+
+
 </head>
 
 <body>
@@ -66,12 +68,9 @@
   <div id="timeline-container">
     <div id="timeline-flex-row">
       <div id="timeline-slider-col">
-        <input type="range" id="timeline" min="1820" max="2020" step="5" value="2020">
+        <input type="range" id="timeline" min="1820" max="2020" step="1" value="2020">
+         <div id="year-badge" class="year-badge"></div>
         <div id="timeline-ticks"></div>
-      </div>
-      <div id="timeline-ano-col">
-        <span id="timeline-label">Ano:</span>
-        <span id="year-value">2020</span>
       </div>
     </div>
     
@@ -119,36 +118,69 @@
   <script src="styles/Terreno_Niteroi_1_style.js"></script>
   <script src="styles/Lagunas_2_style.js"></script>
   <script src="styles/Area_Urbana_4_style.js"></script>
+  <script src="styles/Logradouros_6_style_Margin.js"></script>
   <script src="styles/Logradouros_6_style.js"></script>
   <script src="styles/EdifciosHistricos_7_style.js"></script>
   <script src="js/popups.js"></script>
   <script src="js/historical-facts.js"></script>
   <script>
     // Função para gerar ticks de anos responsivos
-    function renderTimelineTicks() {
-      const ticksDiv = document.getElementById('timeline-ticks');
-      const slider = document.getElementById('timeline');
-      const min = 1820; // fixo para garantir ticks corretos
-      const max = parseInt(slider.max);
-      const step = parseInt(slider.step);
-      let nTicks = Math.floor(slider.offsetWidth / 60);
-      if (window.innerWidth < 600) nTicks = Math.floor(slider.offsetWidth / 44);
-      nTicks = Math.max(4, Math.min(nTicks, Math.floor((max-min)/step)+1));
-      let ticks = [];
-      let range = max - min;
-      let interval = Math.round(range / (nTicks-1) / step) * step;
-      if (interval < step) interval = step;
-      for (let year = min; year <= max; year += interval) {
-        ticks.push(year);
-      }
-      if (ticks[ticks.length-1] !== max) ticks[ticks.length-1] = max;
-      ticksDiv.innerHTML = '';
-      for (let i=0; i<ticks.length; i++) {
-        const span = document.createElement('span');
-        span.textContent = ticks[i];
-        ticksDiv.appendChild(span);
-      }
-    }
+function renderTimelineTicks() {
+  const ticksDiv = document.getElementById('timeline-ticks');
+  const slider = document.getElementById('timeline');
+  const min = 1820;
+  const max = parseInt(slider.max);
+  const step = parseInt(slider.step);
+  const sliderWidth = slider.offsetWidth;
+  const thumbWidth = 18; // mesmo valor usado em updateBadgePosition
+
+  let nTicks = Math.floor(sliderWidth / 60);
+  if (window.innerWidth < 600) nTicks = Math.floor(sliderWidth / 44);
+  nTicks = Math.max(4, Math.min(nTicks, Math.floor((max-min)/step)+1));
+
+  let ticks = [];
+  let range = max - min;
+  let interval = Math.round(range / (nTicks-1) / step) * step;
+  if (interval < step) interval = step;
+  for (let year = min; year <= max; year += interval) {
+    ticks.push(year);
+  }
+  if (ticks[ticks.length-1] !== max) ticks[ticks.length-1] = max;
+
+  ticksDiv.innerHTML = '';
+  ticks.forEach(year => {
+    const percent = (year - min) / (max - min);
+    const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
+
+    const span = document.createElement('span');
+    span.textContent = year;
+    span.style.left = offset + 'px';
+    ticksDiv.appendChild(span);
+  });
+}
+
+    const slider = document.getElementById('timeline');
+    const badge = document.getElementById('year-badge');
+
+  function updateBadgePosition() {
+    const min = Number(slider.min);
+    const max = Number(slider.max);
+    const value = Number(slider.value);
+    const percent = (value - min) / (max - min);
+
+    // largura do thumb precisa bater com o CSS do seu slider (ex: 18px)
+    const thumbWidth = 18;
+    const sliderWidth = slider.offsetWidth;
+    const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
+
+    badge.style.left = offset + 'px';
+    badge.textContent = value;
+}
+
+slider.addEventListener('input', updateBadgePosition);
+window.addEventListener('resize', updateBadgePosition); // reposiciona se a tela mudar de tamanho
+updateBadgePosition(); // roda uma vez ao carregar
+
     window.addEventListener('resize', renderTimelineTicks);
     setTimeout(renderTimelineTicks, 200);
     // Atualizar ticks ao carregar e ao mudar tamanho
@@ -266,14 +298,26 @@
       renderer: 'webgl'
     });
 
-    // Logradouros (com timeline)
-    let logradourosSource = new ol.source.Vector({});
-    let logradourosLayer = new ol.layer.Vector({
-      source: logradourosSource,
-      style: style_Logradouros_6,
-      title: 'Logradouros (ruas)',
-      renderer: 'webgl'
-    });
+// Uma única fonte, compartilhada pelas duas camadas
+let logradourosSource = new ol.source.Vector({});
+
+// Camada de margem (borda), desenhada por baixo
+let logradourosMarginLayer = new ol.layer.Vector({
+  source: logradourosSource,             // <- mesma fonte da principal
+  style: style_Logradouros_6_style_Margin,
+  title: 'Margem das Ruas',
+  renderer: 'webgl',
+
+});
+
+// Camada principal (traço + label)
+let logradourosLayer = new ol.layer.Vector({
+  source: logradourosSource,             // <- mesma fonte
+  style: style_Logradouros_6,
+  title: 'Logradouros (ruas)',
+  renderer: 'webgl',
+
+});
 
     let timelineUpdateTimeout;
     function atualizarCamadasTemporaisDebounced(ano) {
@@ -316,7 +360,8 @@
         relevoLayer,
         lagunasLayer,
         areaUrbanaLayer,
-        logradourosLayer,
+        logradourosMarginLayer, // Margem primeiro
+        logradourosLayer,       // Traço depois
         edifLayer,
         googleSatellite  // Adicionando a camada do Google Maps
       ],
@@ -360,10 +405,8 @@
 
     // Controle timeline
     const timeline = document.getElementById('timeline');
-    const yearValue = document.getElementById('year-value');
     timeline.addEventListener('input', function() {
       anoAtual = parseInt(this.value);
-      yearValue.textContent = anoAtual;
       atualizarCamadasTemporaisDebounced(anoAtual); // Usar versão com debounce
       renderTimelineTicks();
     });
@@ -395,6 +438,7 @@
         lagunasLayer.setOpacity(0.6);
         areaUrbanaLayer.setOpacity(0.8);
         // Mantém as camadas temporais visíveis por cima do satélite
+        logradourosMarginLayer.setOpacity(1);
         logradourosLayer.setOpacity(1);
         edifLayer.setOpacity(1);
       } else {

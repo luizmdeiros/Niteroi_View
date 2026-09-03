@@ -83,6 +83,6 @@
   --breakpoint-large: 1200px;
   
   /* Timeline */
-  --timeline-background: rgba(255,255,255,0.95);
+  --timeline-background: rgba(255,255,255,0.62);
   --timeline-gradient: linear-gradient(to right, #cfe2f3, #9fc5e8, #6fa8dc);
 }

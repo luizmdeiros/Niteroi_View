@@ -6,7 +6,8 @@ function categories_Terreno_Niteroi_1(feature, value, size, resolution, labelTex
                 var valueStr = (value !== null && value !== undefined) ? value.toString() : 'default';
                 switch(valueStr) {case 'Terra':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(225,249,227,0.792)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.0}),fill: new ol.style.Fill({color: 'rgba(214,248,226,0.792)'}),
+        stroke: new ol.style.Stroke({color: 'rgba(180,208,123,1)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.0}),
+        fill: new ol.style.Fill({color: 'rgba(180,208,123,1)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)
@@ -14,7 +15,8 @@ function categories_Terreno_Niteroi_1(feature, value, size, resolution, labelTex
                     break;
 case 'Areia':
                     return [ new ol.style.Style({
-        stroke: new ol.style.Stroke({color: 'rgba(225,249,227,0.792)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.0}),fill: new ol.style.Fill({color: 'rgba(246,236,207,0.792)'}),
+        stroke: new ol.style.Stroke({color: 'rgba(254,225,147,1)', lineDash: null, lineCap: 'butt', lineJoin: 'miter', width: 0.0}),
+        fill: new ol.style.Fill({color: 'rgba(254,225,147,1)'}),
         text: createTextStyle(feature, resolution, labelText, labelFont,
                               labelFill, placement, bufferColor,
                               bufferWidth)

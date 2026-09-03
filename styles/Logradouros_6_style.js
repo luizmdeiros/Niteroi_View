@@ -3,7 +3,7 @@ var placement = 'point';
 
 var style_Logradouros_6 = function(feature, resolution) {
     var labelText = "";
-    var labelFont = "9px 'Arial', sans-serif";
+    var labelFont = "10px 'Arial', sans-serif";
     var labelFill = "#323232";
     var bufferColor = "";
     var bufferWidth = 0;
@@ -77,7 +77,7 @@ var style_Logradouros_6 = function(feature, resolution) {
     }
 
     // Ajuste de largura do traço por escala de referência
-    var strokeWidth = 3.3744; // padrão
+    var strokeWidth = 3; // padrão
     if (typeof map !== 'undefined') {
         var zoom = map.getView().getZoom();
         if (zoom >= 15 && zoom <= 18) {
