@@ -247,7 +247,7 @@ updateBadgePosition(); // roda uma vez ao carregar
       style: function(feature, resolution) {
         // Simplificar geometria em zoom baixo
         if (resolution > 10) {
-          const simplified = feature.getGeometry().simplify(resolution * 2);
+          const simplified = feature.getGeometry().simplify(resolution * 1.5);
           feature.setGeometry(simplified);
         }
         return style_Terreno_Niteroi_1(feature, resolution);
@@ -307,7 +307,7 @@ let logradourosMarginLayer = new ol.layer.Vector({
   style: style_Logradouros_6_style_Margin,
   title: 'Margem das Ruas',
   renderer: 'webgl',
-
+  declutter: true
 });
 
 // Camada principal (traço + label)
@@ -316,7 +316,7 @@ let logradourosLayer = new ol.layer.Vector({
   style: style_Logradouros_6,
   title: 'Logradouros (ruas)',
   renderer: 'webgl',
-
+  declutter: true
 });
 
     let timelineUpdateTimeout;

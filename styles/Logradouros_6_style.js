@@ -1,9 +1,42 @@
 var size = 0;
 var placement = 'point';
 
+
+// Define a partir de qual zoom cada categoria de via passa a ser desenhada.
+// Isso evita que, em zoom baixo, todas as ruas (inclusive travessas/becos)
+// apareçam juntas formando uma "maçaroca" ilegível.
+function zoomMinimoParaTipo(tipo) {
+    switch (tipo) {
+        case 'Estrada':
+            return 11;
+        case 'Tunel':
+            return 11;
+        case 'Avenida':
+            return 11; // sempre visível, mesmo no zoom mínimo do mapa
+        case 'Rua':
+            return 13;
+        case 'Alameda':
+            return 14;
+        case 'Travessa':
+            return 15;
+        case 'Beco':
+            return 15;
+        default:
+            return 14;
+    }
+}
+
 var style_Logradouros_6 = function(feature, resolution) {
+      var tipo = feature.get('tipo') || feature.get('tipo_logra') || '';
+
+    if (typeof map !== 'undefined') {
+        var zoomAtual = map.getView().getZoom();
+        if (zoomAtual < zoomMinimoParaTipo(tipo)) {
+            return null; // não desenha nada para essa feature neste zoom
+        }
+    }
     var labelText = "";
-    var labelFont = "10px 'Arial', sans-serif";
+    var labelFont = "9px 'Arial', sans-serif";
     var labelFill = "#323232";
     var bufferColor = "";
     var bufferWidth = 0;
@@ -38,6 +71,27 @@ var style_Logradouros_6 = function(feature, resolution) {
         });
         return maxLine;
     }
+
+// Define um multiplicador de largura conforme a categoria da via (campo "tipo"),
+// para vias maiores (avenidas) ficarem visivelmente mais largas que travessas/becos,
+// mantendo a mesma escala relativa entre zooms que larguraTracoLogradouro já calcula.
+function fatorHierarquiaViaria(feature) {
+    var tipo = feature.get('tipo') || feature.get('tipo_logra') || '';
+    switch (tipo) {
+        case 'Avenida':
+            return 1.35;
+        case 'Rua':
+            return 1.0;
+        case 'Alameda':
+            return 0.9;
+        case 'Travessa':
+            return 0.6;
+        case 'Beco':
+            return 0.55;
+        default:
+            return 0.85; // categorias não mapeadas (ex: Praça, Estrada) ficam num meio-termo
+    }
+}
 
     var geom = feature.getGeometry();
     var coords = geom.getCoordinates();
@@ -77,7 +131,7 @@ var style_Logradouros_6 = function(feature, resolution) {
     }
 
     // Ajuste de largura do traço por escala de referência
-    var strokeWidth = 3; // padrão
+    var strokeWidth = 3.3744; // padrão
     if (typeof map !== 'undefined') {
         var zoom = map.getView().getZoom();
         if (zoom >= 15 && zoom <= 18) {
@@ -88,9 +142,15 @@ var style_Logradouros_6 = function(feature, resolution) {
             var scale = resolution * 39.37 * dpi / metersPerUnit;
             strokeWidth = 3.7 * (15000 / scale); // 3.7px na escala 1:15000
         }
-        // Garante um valor mínimo para strokeWidth
-        if (strokeWidth < 0.5 || isNaN(strokeWidth)) strokeWidth = 0.5;
-        console.log('[Logradouros] zoom:', zoom, 'strokeWidth:', strokeWidth);
+        // Aplica a hierarquia viária sobre a largura calculada pela escala/zoom
+var fatorHierarquia = fatorHierarquiaViaria(feature);
+
+strokeWidth = strokeWidth * fatorHierarquia;
+
+// Garante um valor mínimo para strokeWidth
+if (strokeWidth < 0.5 || isNaN(strokeWidth)) {
+    strokeWidth = 0.5;
+}
     }
     // Define cor do traço para Túnel
     var strokeColor = 'rgba(255,255,255,1.0)'; // padrão branco
